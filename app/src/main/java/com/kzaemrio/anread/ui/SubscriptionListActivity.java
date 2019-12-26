@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.kzaemrio.anread.R;
-import com.kzaemrio.anread.adapter.SimpleItemDecoration;
+import com.kzaemrio.anread.adapter.SimpleDividerItemDecoration;
 import com.kzaemrio.anread.adapter.SubscriptionAdapter;
 import com.kzaemrio.anread.model.Subscription;
 
@@ -88,7 +88,7 @@ public class SubscriptionListActivity extends AppCompatActivity {
 
             RecyclerView recyclerView = new RecyclerView(context);
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
-            recyclerView.addItemDecoration(new SimpleItemDecoration(context));
+            recyclerView.addItemDecoration(new SimpleDividerItemDecoration(context));
 
             return new MvpView() {
                 @Override

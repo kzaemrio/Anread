@@ -11,12 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class SimpleItemDecoration extends RecyclerView.ItemDecoration {
+public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
 
     private final int mMargin;
     private final Paint mPaint;
 
-    public SimpleItemDecoration(Context context) {
+    public SimpleDividerItemDecoration(Context context) {
         mMargin = context.getResources().getDimensionPixelSize(R.dimen.space_small);
         mPaint = new Paint();
         mPaint.setColor(ContextCompat.getColor(context, R.color.text_color_header));
@@ -28,13 +28,15 @@ public class SimpleItemDecoration extends RecyclerView.ItemDecoration {
         if (parent.getAdapter() != null && parent.getAdapter().getItemCount() > 1) {
             for (int i = 0; i < parent.getChildCount(); i++) {
                 View view = parent.getChildAt(i);
-                c.drawRect(
-                        mMargin,
-                        view.getBottom() - 1,
-                        view.getRight() - mMargin,
-                        view.getBottom(),
-                        mPaint
-                );
+                if (parent.getChildAdapterPosition(view) != parent.getAdapter().getItemCount() - 1) {
+                    c.drawRect(
+                            mMargin,
+                            view.getBottom() - 1,
+                            view.getRight() - mMargin,
+                            view.getBottom(),
+                            mPaint
+                    );
+                }
             }
         }
     }

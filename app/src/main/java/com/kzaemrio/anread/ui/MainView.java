@@ -6,7 +6,8 @@ import android.view.View;
 
 import com.kzaemrio.anread.adapter.AddSubscriptionAdapter;
 import com.kzaemrio.anread.adapter.MainAdapter;
-import com.kzaemrio.anread.adapter.SimpleItemDecoration;
+import com.kzaemrio.anread.adapter.SimpleDividerItemDecoration;
+import com.kzaemrio.anread.adapter.SimpleOffsetItemDecoration;
 import com.kzaemrio.anread.databinding.ActivityMainBinding;
 import com.kzaemrio.anread.model.Item;
 import com.kzaemrio.anread.model.Subscription;
@@ -17,7 +18,8 @@ public interface MainView {
     static MainView create(Context context) {
 
         ActivityMainBinding binding = ActivityMainBinding.inflate(LayoutInflater.from(context));
-        binding.list.addItemDecoration(new SimpleItemDecoration(context));
+        binding.list.addItemDecoration(new SimpleDividerItemDecoration(context));
+        binding.list.addItemDecoration(new SimpleOffsetItemDecoration());
 
         return new MainView() {
 
