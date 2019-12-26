@@ -6,29 +6,21 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
 
-import com.kzaemrio.anread.R;
+import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.databinding.ActivityAddSubscriptionBinding;
-import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
-import com.kzaemrio.anread.model.Feed;
-import com.kzaemrio.anread.model.Item;
-import com.kzaemrio.anread.model.ItemDao;
-import com.kzaemrio.anread.model.Subscription;
-
-import org.simpleframework.xml.core.Persister;
 
 import java.util.Objects;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import io.reactivex.subjects.BehaviorSubject;
 
 public class AddSubscriptionActivity extends AppCompatActivity {
     public static Intent createIntent(Context context) {
@@ -39,56 +31,91 @@ public class AddSubscriptionActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ActivityAddSubscriptionBinding binding = DataBindingUtil.setContentView(
-                this,
-                R.layout.activity_add_subscription
-        );
+        AddSubscriptionView view = AddSubscriptionView.create(this);
+        view.setCallback(() -> {
+            view.showLoading(true);
 
-        binding.input.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                binding.bt.setEnabled(!TextUtils.isEmpty(s.toString().trim()));
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
-        binding.bt.setOnClickListener(v -> {
-            Observable.just(Objects.requireNonNull(binding.input.getText()))
+            Observable.just(Objects.requireNonNull(view.getInput()))
                     .map(Objects::toString)
-                    .doOnNext(url -> {
-                        Request request = new Request.Builder().url(url).build();
-                        Response response = new OkHttpClient.Builder().build().newCall(request).execute();
-                        Feed feed = new Persister().read(Feed.class, response.body().byteStream(), false);
-                        Subscription channel = Subscription.create(url, feed.mFeedChannel.mTitle);
-
-                        Item[] itemList = Observable.fromIterable(feed.mFeedChannel.mFeedItemList)
-                                .map(i -> Item.create(i, url))
-                                .toList()
-                                .map(list -> list.toArray(new Item[list.size()]))
-                                .blockingGet();
-                        AppDatabase database = AppDatabaseHolder.of(getApplicationContext());
-                        database.subscriptionDao().insert(channel);
-                        ItemDao dao = database.itemDao();
-                        dao.insert(itemList);
-                    })
+                    .map(Actions::getRssResult)
+                    .doOnNext(rssResult -> Actions.insertRssResult(AppDatabaseHolder.of(getApplicationContext().getApplicationContext()), rssResult))
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext(url -> {
-                        setResult(RESULT_OK, new Intent().putExtra("url", url));
+                        view.showLoading(false);
+                        setResult(RESULT_OK, new Intent().putExtra("url", url.getSubscription().getUrl()));
                         finish();
                     })
                     .subscribe();
         });
 
-        binding.input.setText("https://www.ithome.com/rss/");
+        setContentView(view.getContentView());
+    }
+
+    private interface AddSubscriptionView {
+        static AddSubscriptionView create(Context context) {
+            ActivityAddSubscriptionBinding binding = ActivityAddSubscriptionBinding.inflate(LayoutInflater.from(context));
+
+            BehaviorSubject<Boolean> isInputEmpty = BehaviorSubject.createDefault(true);
+            BehaviorSubject<Boolean> isLoadingShow = BehaviorSubject.createDefault(false);
+
+            Observable.merge(isInputEmpty, isLoadingShow)
+                    .doOnNext(i -> binding.bt.setEnabled(!isInputEmpty.getValue() && !isLoadingShow.getValue()))
+                    .subscribe();
+
+            binding.input.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    isInputEmpty.onNext(TextUtils.isEmpty(s));
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+
+            binding.input.setText("https://www.ithome.com/rss/");
+
+            return new AddSubscriptionView() {
+                @Override
+                public View getContentView() {
+                    return binding.getRoot();
+                }
+
+                @Override
+                public void setCallback(Callback callback) {
+                    binding.bt.setOnClickListener(v -> callback.onBtClick());
+                }
+
+                @Override
+                public CharSequence getInput() {
+                    return binding.input.getText();
+                }
+
+                @Override
+                public void showLoading(boolean isShow) {
+                    isLoadingShow.onNext(isShow);
+                    binding.progress.setVisibility(isShow ? View.VISIBLE : View.INVISIBLE);
+                }
+            };
+        }
+
+        View getContentView();
+
+        void setCallback(Callback callback);
+
+        CharSequence getInput();
+
+        void showLoading(boolean isShow);
+
+        interface Callback {
+            void onBtClick();
+        }
     }
 }

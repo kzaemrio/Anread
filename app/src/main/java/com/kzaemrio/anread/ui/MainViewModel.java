@@ -1,13 +1,21 @@
 package com.kzaemrio.anread.ui;
 
 import android.app.Application;
+import android.content.Context;
 
+import com.kzaemrio.anread.Actions;
+import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
+import com.kzaemrio.anread.model.Item;
+import com.kzaemrio.anread.model.Subscription;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
@@ -17,6 +25,8 @@ public class MainViewModel extends AndroidViewModel {
 
     private MutableLiveData<Boolean> mIsShowLoading;
     private MutableLiveData<Boolean> mIsShowAddSubscription;
+    private MutableLiveData<MainView.ViewItem> mViewItem;
+    private MutableLiveData<List<Item>> mItemList;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
@@ -38,20 +48,42 @@ public class MainViewModel extends AndroidViewModel {
         return mIsShowAddSubscription;
     }
 
-    public void init() {
-        mIsShowLoading.setValue(true);
+    public LiveData<MainView.ViewItem> getViewItem() {
+        if (mViewItem == null) {
+            mViewItem = new MutableLiveData<>();
+        }
+        return mViewItem;
+    }
 
-        AppDatabaseHolder.of(getApplication())
-                .subscriptionDao()
-                .getAll()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(list -> {
+    public LiveData<List<Item>> getItemList() {
+        if (mItemList == null) {
+            mItemList = new MutableLiveData<>();
+        }
+        return mItemList;
+    }
+
+    public void init() {
+        Observable.<Context>just(getApplication())
+                .doOnNext(context -> {
+                    AppDatabase database = AppDatabaseHolder.of(context);
+                    List<Subscription> list = database.subscriptionDao().getAll();
+
                     if (list.isEmpty()) {
-                        mIsShowLoading.setValue(false);
-                        mIsShowAddSubscription.setValue(true);
+                        mIsShowAddSubscription.postValue(true);
+                    } else {
+                        Observable.fromIterable(list)
+                                .map(Subscription::getUrl)
+                                .map(Actions::getRssResult)
+                                .doOnNext(rssResult -> Actions.insertRssResult(database, rssResult))
+                                .subscribe();
+
+                        mItemList.postValue(database.itemDao().getAll());
                     }
                 })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe(d -> mIsShowLoading.postValue(true))
+                .doOnComplete(() -> mIsShowLoading.postValue(false))
                 .subscribe();
     }
 }

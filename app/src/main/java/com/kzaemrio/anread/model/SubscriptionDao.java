@@ -5,15 +5,16 @@ import java.util.List;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import io.reactivex.Observable;
 
 @Dao
 public interface SubscriptionDao {
     @Query("SELECT * FROM subscription")
-    Observable<List<Subscription>> getAll();
+    List<Subscription> getAll();
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Subscription... subscriptions);
 
     @Delete

@@ -9,13 +9,38 @@ import androidx.room.PrimaryKey;
 public class Subscription {
     @NonNull
     @PrimaryKey
-    String mUrl;
+    private String mUrl;
 
     @ColumnInfo
-    String mTitle;
+    private String mTitle;
 
     @ColumnInfo
-    public long mCreateTime;
+    private long mCreateTime;
+
+    @NonNull
+    public String getUrl() {
+        return mUrl;
+    }
+
+    public void setUrl(@NonNull String url) {
+        mUrl = url;
+    }
+
+    public String getTitle() {
+        return mTitle;
+    }
+
+    public void setTitle(String title) {
+        mTitle = title;
+    }
+
+    public long getCreateTime() {
+        return mCreateTime;
+    }
+
+    public void setCreateTime(long createTime) {
+        mCreateTime = createTime;
+    }
 
     public static Subscription create(String url, String title) {
         Subscription channel = new Subscription();

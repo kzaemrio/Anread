@@ -21,6 +21,9 @@ public class Item {
     public String mPubDate;
 
     @ColumnInfo
+    public String mChannelName;
+
+    @ColumnInfo
     public String mChannelUrl;
 
     @ColumnInfo
@@ -29,12 +32,13 @@ public class Item {
     @ColumnInfo
     public int mIsFav;
 
-    public static Item create(FeedItem feedItem, String url) {
+    public static Item create(FeedItem feedItem, String channelName, String url) {
         Item item = new Item();
         item.mLink = feedItem.mLink;
         item.mTitle = feedItem.mTitle;
         item.mDes = feedItem.mDes;
         item.mPubDate = feedItem.mPubDate;
+        item.mChannelName = channelName;
         item.mChannelUrl = url;
         item.mIsRead = 0;
         item.mIsFav = 0;

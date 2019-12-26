@@ -22,11 +22,17 @@ public class MainActivity extends AppCompatActivity {
                 router.toAddSubscription();
             }
 
+            @Override
+            public void onRefresh() {
+                model.init();
+            }
+
         });
         setContentView(mainView.getContentView());
 
         model.isShowLoading().observe(this, mainView::showLoading);
         model.isShowAddSubscription().observe(this, mainView::showAddSubscription);
+        model.getItemList().observe(this, mainView::bind);
 
         model.init();
     }
