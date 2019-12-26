@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Anread</string>
+    <string name="add_subscription">添加订阅源</string>
+    <string name="hint_rss_link">rss link</string>
 </resources>
