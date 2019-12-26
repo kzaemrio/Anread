@@ -11,7 +11,7 @@ import io.reactivex.Observable;
 
 @Dao
 public interface SubscriptionDao {
-    @Query("SELECT * FROM subscription")
+    @Query("SELECT * FROM subscription ORDER BY mCreateTime")
     List<Subscription> getAll();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

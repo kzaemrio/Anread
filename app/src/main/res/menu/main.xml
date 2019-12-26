@@ -6,7 +6,7 @@
 
     <item
         android:id="@+id/read"
-        android:icon="@drawable/ic_all_check_white_24dp"
+        android:icon="@drawable/ic_done_all_24dp"
         android:title="@string/menu_read"
         app:showAsAction="ifRoom" />
 

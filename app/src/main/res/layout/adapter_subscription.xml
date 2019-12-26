@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout>
+
+    <TextView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:paddingStart="@dimen/space_large"
+        android:paddingTop="@dimen/space_small"
+        android:paddingEnd="@dimen/space_large"
+        android:paddingBottom="@dimen/space_small"
+        android:textSize="@dimen/text_size_title" />
+</layout>

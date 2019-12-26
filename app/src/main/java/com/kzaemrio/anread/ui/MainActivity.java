@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     private MainViewModel mViewModel;
     private MainView mView;
+    private Router mRouter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,11 +28,11 @@ public class MainActivity extends AppCompatActivity {
 
         mView = MainView.create(this);
 
-        Router router = Router.create(this);
+        mRouter = Router.create(this);
         mView.setCallback(new MainView.Callback() {
             @Override
             public void onAddSubscriptionClick() {
-                router.toAddSubscription();
+                mRouter.toAddSubscription();
             }
 
             @Override
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(Item item) {
-                router.toDetail(item.mLink);
+                mRouter.toDetail(item.mLink);
             }
 
         });
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 mViewModel.readAll();
                 return true;
             case R.id.rss:
+                mRouter.toSubscriptionList();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -79,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         if (resultCode == RESULT_OK) {
             switch (requestCode) {
                 case Router.REQUEST_CODE_ADD_SUBSCRIPTION:
+                case Router.REQUEST_CODE_SUBSCRIPTION_LIST:
                     mViewModel.init();
                     break;
             }
@@ -89,6 +92,7 @@ public class MainActivity extends AppCompatActivity {
 
         int REQUEST_CODE_ADD_SUBSCRIPTION = 1;
         int REQUEST_CODE_TO_DETAIL = 2;
+        int REQUEST_CODE_SUBSCRIPTION_LIST = 3;
 
         static Router create(Activity activity) {
             return () -> activity;
@@ -107,6 +111,13 @@ public class MainActivity extends AppCompatActivity {
             activity().startActivityForResult(
                     DetailActivity.createIntent(activity(), link),
                     REQUEST_CODE_TO_DETAIL
+            );
+        }
+
+        default void toSubscriptionList() {
+            activity().startActivityForResult(
+                    SubscriptionListActivity.createIntent(activity()),
+                    REQUEST_CODE_SUBSCRIPTION_LIST
             );
         }
     }

@@ -16,6 +16,9 @@ public interface ItemDao {
     @Query("SELECT * FROM item Where mLink = (:link)")
     Item query(String link);
 
+    @Query("SELECT * FROM item Where mChannelUrl = (:link)")
+    List<Item> queryBy(String link);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertReplace(Item... subscriptions);
 

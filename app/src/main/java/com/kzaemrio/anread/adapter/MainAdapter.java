@@ -68,14 +68,27 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.Holder> {
             mBind.title.setText(item.mTitle);
             mBind.label.setText(item.mChannelName);
             mBind.time.setText(item.mPubDate);
-            mBind.content.setText(Html.fromHtml(item.mDes.substring(item.mDes.indexOf("<p>") + "<p>".length(), item.mDes.indexOf("</p>"))));
+            String des = item.mDes;
+            mBind.content.setText(Html.fromHtml(getText(des)));
 
             boolean notRead = item.mIsRead == 0;
 
             color(mBind.title, notRead, R.color.text_color_title);
             color(mBind.label, notRead, R.color.colorAccent);
-            color(mBind.time, notRead, R.color.text_color_title);
+            color(mBind.time, notRead, R.color.text_color_header);
             color(mBind.content, notRead, R.color.text_color_content);
+        }
+
+        private String getText(String des) {
+            String startStr = "<p>";
+            String endStr = "</p>";
+            int endIndex = des.indexOf(endStr);
+            String text = des.substring(des.indexOf(startStr) + startStr.length(), endIndex);
+            if (text.startsWith("<")) {
+                return getText(des.substring(endIndex + endStr.length()));
+            } else {
+                return text;
+            }
         }
 
         private void color(TextView title, boolean notRead, int colorId) {

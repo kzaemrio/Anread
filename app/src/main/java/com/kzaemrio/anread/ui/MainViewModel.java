@@ -91,6 +91,7 @@ public class MainViewModel extends AndroidViewModel {
                     })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
+
                     .subscribe();
         }
     }

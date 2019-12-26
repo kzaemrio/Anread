@@ -35,9 +35,9 @@ public class Item {
     public static Item create(FeedItem feedItem, String channelName, String url) {
         Item item = new Item();
         item.mLink = feedItem.mLink;
-        item.mTitle = feedItem.mTitle;
-        item.mDes = feedItem.mDes;
-        item.mPubDate = feedItem.mPubDate;
+        item.mTitle = feedItem.mTitle.trim();
+        item.mDes = feedItem.mDes.trim();
+        item.mPubDate = feedItem.mPubDate.trim();
         item.mChannelName = channelName;
         item.mChannelUrl = url;
         item.mIsRead = 0;
