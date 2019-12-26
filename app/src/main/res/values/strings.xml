@@ -9,4 +9,8 @@
     <string name="header_fav">收藏</string>
     <string name="menu_rss">管理订阅源</string>
     <string name="menu_read">全部标记已读</string>
+    <string name="menu_open">浏览器打开</string>
+    <string name="menu_share">分享</string>
+    <string name="action_open">浏览器打开</string>
+    <string name="action_share">分享</string>
 </resources>
