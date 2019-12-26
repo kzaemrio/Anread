@@ -13,6 +13,9 @@ public interface ItemDao {
     @Query("SELECT * FROM item Order by mPubDate")
     List<Item> getAll();
 
+    @Query("SELECT * FROM item Where mLink = (:link)")
+    Item query(String link);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Item... subscriptions);
 

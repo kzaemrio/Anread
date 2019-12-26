@@ -7,4 +7,6 @@
     <string name="header_unread">未读</string>
     <string name="header_all">全部</string>
     <string name="header_fav">收藏</string>
+    <string name="menu_rss">管理订阅源</string>
+    <string name="menu_read">全部标记已读</string>
 </resources>

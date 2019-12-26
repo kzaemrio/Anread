@@ -25,7 +25,6 @@ public class MainViewModel extends AndroidViewModel {
 
     private MutableLiveData<Boolean> mIsShowLoading;
     private MutableLiveData<Boolean> mIsShowAddSubscription;
-    private MutableLiveData<MainView.ViewItem> mViewItem;
     private MutableLiveData<List<Item>> mItemList;
 
     public MainViewModel(@NonNull Application application) {
@@ -48,12 +47,6 @@ public class MainViewModel extends AndroidViewModel {
         return mIsShowAddSubscription;
     }
 
-    public LiveData<MainView.ViewItem> getViewItem() {
-        if (mViewItem == null) {
-            mViewItem = new MutableLiveData<>();
-        }
-        return mViewItem;
-    }
 
     public LiveData<List<Item>> getItemList() {
         if (mItemList == null) {
@@ -85,5 +78,9 @@ public class MainViewModel extends AndroidViewModel {
                 .doOnSubscribe(d -> mIsShowLoading.postValue(true))
                 .doOnComplete(() -> mIsShowLoading.postValue(false))
                 .subscribe();
+    }
+
+    public void readAll() {
+
     }
 }

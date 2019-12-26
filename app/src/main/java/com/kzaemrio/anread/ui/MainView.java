@@ -13,8 +13,6 @@ import com.kzaemrio.anread.model.Subscription;
 
 import java.util.List;
 
-import androidx.recyclerview.widget.DividerItemDecoration;
-
 public interface MainView {
     static MainView create(Context context) {
 
@@ -44,7 +42,7 @@ public interface MainView {
 
             @Override
             public void bind(List<Item> items) {
-                binding.list.setAdapter(new MainAdapter(items));
+                binding.list.setAdapter(new MainAdapter(items, mCallback::onItemClick));
             }
 
             @Override
@@ -69,6 +67,8 @@ public interface MainView {
         void onAddSubscriptionClick();
 
         void onRefresh();
+
+        void onItemClick(Item item);
     }
 
     interface ViewItem {
