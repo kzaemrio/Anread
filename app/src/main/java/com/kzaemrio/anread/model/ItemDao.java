@@ -17,7 +17,10 @@ public interface ItemDao {
     Item query(String link);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Item... subscriptions);
+    void insertReplace(Item... subscriptions);
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    void insertIgnore(Item... subscriptions);
 
     @Delete
     void delete(Item... items);

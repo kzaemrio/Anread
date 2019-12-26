@@ -81,6 +81,17 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void readAll() {
-
+        if (mItemList != null && mItemList.getValue() != null) {
+            Observable.fromIterable(mItemList.getValue())
+                    .doOnNext(item -> item.mIsRead = 1)
+                    .toList()
+                    .doOnSuccess(list -> {
+                        mItemList.postValue(list);
+                        AppDatabaseHolder.of(getApplication()).itemDao().insertReplace(list.toArray(new Item[0]));
+                    })
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe();
+        }
     }
 }

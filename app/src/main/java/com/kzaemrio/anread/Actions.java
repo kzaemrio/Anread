@@ -31,7 +31,7 @@ public interface Actions {
 
     static void insertRssResult(AppDatabase database, RssResult rssResult) {
         database.subscriptionDao().insert(rssResult.getSubscription());
-        database.itemDao().insert(rssResult.getItemArray());
+        database.itemDao().insertIgnore(rssResult.getItemArray());
     }
 
     interface RssResult {

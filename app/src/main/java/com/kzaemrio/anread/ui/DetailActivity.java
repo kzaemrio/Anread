@@ -12,6 +12,7 @@ import android.webkit.WebView;
 import com.kzaemrio.anread.R;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
+import com.kzaemrio.anread.model.ItemDao;
 
 import java.util.Objects;
 
@@ -39,7 +40,13 @@ public class DetailActivity extends AppCompatActivity {
         String link = getIntent().getStringExtra(EXTRA_LINK);
         if (!TextUtils.isEmpty(link)) {
             Observable.just(link)
-                    .map(url -> AppDatabaseHolder.of(this).itemDao().query(link))
+                    .map(url -> {
+                        ItemDao dao = AppDatabaseHolder.of(this).itemDao();
+                        Item item = dao.query(link);
+                        item.mIsRead = 1;
+                        dao.insertReplace(item);
+                        return item;
+                    })
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext(item -> mItem = item)
