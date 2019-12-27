@@ -88,8 +88,7 @@ public class MainActivity extends AppCompatActivity {
     private interface Router {
 
         int REQUEST_CODE_ADD_SUBSCRIPTION = 1;
-        int REQUEST_CODE_TO_DETAIL = 2;
-        int REQUEST_CODE_SUBSCRIPTION_LIST = 3;
+        int REQUEST_CODE_SUBSCRIPTION_LIST = 2;
 
         static void toAddSubscription(Activity activity) {
             activity.startActivityForResult(
@@ -99,10 +98,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         static void toDetail(Activity activity, String link) {
-            activity.startActivityForResult(
-                    DetailActivity.createIntent(activity, link),
-                    REQUEST_CODE_TO_DETAIL
-            );
+            activity.startActivity(DetailActivity.createIntent(activity, link));
         }
 
         static void toSubscriptionList(Activity activity) {
