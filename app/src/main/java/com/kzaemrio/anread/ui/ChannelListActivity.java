@@ -18,13 +18,12 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.util.Consumer;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class ChannelListActivity extends AppCompatActivity {
+public class ChannelListActivity extends BaseActivity {
 
     private ChannelListViewModel mViewModel;
 
@@ -69,14 +68,16 @@ public class ChannelListActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case Router.REQUEST_ADD_CHANNEL:
-                setResult(RESULT_OK);
-                mViewModel.loadChannelList();
-                break;
-            case Router.REQUEST_CHANNEL:
-                setResult(RESULT_OK);
-                break;
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case Router.REQUEST_ADD_CHANNEL:
+                    setResult(RESULT_OK);
+                    mViewModel.loadChannelList();
+                    break;
+                case Router.REQUEST_CHANNEL:
+                    setResult(RESULT_OK);
+                    break;
+            }
         }
     }
 

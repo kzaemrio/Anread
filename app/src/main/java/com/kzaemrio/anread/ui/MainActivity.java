@@ -11,10 +11,9 @@ import com.kzaemrio.anread.model.Item;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
 
     private MainViewModel mViewModel;
 
@@ -46,15 +45,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(view.getContentView());
 
         mViewModel.isShowLoading().observe(this, view::showLoading);
-        mViewModel.isShowAddSubscription().observe(this, view::showAddSubscription);
+        mViewModel.isShowAddSubscription().observe(this, is -> {
+            invalidateOptionsMenu();
+            view.showAddSubscription(is);
+        });
         mViewModel.getItemList().observe(this, view::bind);
 
         mViewModel.init();
     }
 
     @Override
+    protected boolean isDisplayHomeAsUpEnabled() {
+        return false;
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
+        Boolean isShow = mViewModel.isShowAddSubscription().getValue();
+        boolean visible = isShow != null && !isShow;
+        menu.findItem(R.id.read).setVisible(visible);
+        menu.findItem(R.id.rss).setVisible(visible);
         return super.onCreateOptionsMenu(menu);
     }
 

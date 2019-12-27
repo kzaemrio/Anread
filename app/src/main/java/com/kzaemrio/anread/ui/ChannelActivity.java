@@ -20,12 +20,11 @@ import java.util.List;
 import java.util.Objects;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class ChannelActivity extends AppCompatActivity {
+public class ChannelActivity extends BaseActivity {
 
     private static final String EXTRA_TITLE = "EXTRA_TITLE";
     private static final String EXTRA_URL = "EXTRA_URL";

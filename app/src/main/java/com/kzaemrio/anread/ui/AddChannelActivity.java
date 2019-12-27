@@ -16,13 +16,12 @@ import com.kzaemrio.anread.model.AppDatabaseHolder;
 import java.util.Objects;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
-public class AddChannelActivity extends AppCompatActivity {
+public class AddChannelActivity extends BaseActivity {
     public static Intent createIntent(Context context) {
         return new Intent(context, AddChannelActivity.class);
     }

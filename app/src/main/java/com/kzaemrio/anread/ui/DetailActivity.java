@@ -20,16 +20,13 @@ import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
 import com.kzaemrio.anread.model.ItemDao;
 
-import java.util.Objects;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends BaseActivity {
 
     private static final String EXTRA_LINK = "EXTRA_LINK";
 
@@ -46,7 +43,6 @@ public class DetailActivity extends AppCompatActivity {
         DetailView detailView = DetailView.create(this);
         setContentView(detailView.getContentView());
 
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         String link = getIntent().getStringExtra(EXTRA_LINK);
         if (!TextUtils.isEmpty(link)) {
             Observable.just(link)
@@ -81,9 +77,6 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                break;
             case R.id.open:
                 Intent openIntent = new Intent();
                 openIntent.setAction(Intent.ACTION_VIEW);

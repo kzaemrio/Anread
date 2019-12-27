@@ -6,8 +6,8 @@ import android.content.Context;
 import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
-import com.kzaemrio.anread.model.Item;
 import com.kzaemrio.anread.model.Channel;
+import com.kzaemrio.anread.model.Item;
 
 import java.util.List;
 
@@ -34,7 +34,6 @@ public class MainViewModel extends AndroidViewModel {
     public LiveData<Boolean> isShowLoading() {
         if (mIsShowLoading == null) {
             mIsShowLoading = new MutableLiveData<>();
-            mIsShowLoading.setValue(false);
         }
         return mIsShowLoading;
     }
@@ -42,7 +41,6 @@ public class MainViewModel extends AndroidViewModel {
     public LiveData<Boolean> isShowAddSubscription() {
         if (mIsShowAddSubscription == null) {
             mIsShowAddSubscription = new MutableLiveData<>();
-            mIsShowAddSubscription.setValue(false);
         }
         return mIsShowAddSubscription;
     }
@@ -70,6 +68,7 @@ public class MainViewModel extends AndroidViewModel {
                                 .doOnNext(rssResult -> Actions.insertRssResult(database, rssResult))
                                 .subscribe();
 
+                        mIsShowAddSubscription.postValue(false);
                         mItemList.postValue(database.itemDao().getAll());
                     }
                 })
