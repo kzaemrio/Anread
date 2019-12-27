@@ -1,9 +1,9 @@
 package com.kzaemrio.anread;
 
 import com.kzaemrio.anread.model.AppDatabase;
+import com.kzaemrio.anread.model.Channel;
 import com.kzaemrio.anread.model.Feed;
 import com.kzaemrio.anread.model.Item;
-import com.kzaemrio.anread.model.Channel;
 
 import org.simpleframework.xml.core.Persister;
 
@@ -22,7 +22,7 @@ public interface Actions {
         Feed feed = new Persister().read(Feed.class, Objects.requireNonNull(response.body()).byteStream(), false);
         Channel channel = Channel.create(url, feed.mFeedChannel.mTitle);
         Item[] itemList = Observable.fromIterable(feed.mFeedChannel.mFeedItemList)
-                .map(i -> Item.create(i, channel.getTitle(), url))
+                .map(feedItem -> Item.create(feedItem, channel.getTitle(), url))
                 .toList()
                 .map(list -> list.toArray(new Item[0]))
                 .blockingGet();

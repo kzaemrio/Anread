@@ -10,7 +10,7 @@ import androidx.room.Query;
 
 @Dao
 public interface ItemDao {
-    @Query("SELECT * FROM item Order by mPubDate")
+    @Query("SELECT * FROM item Order by mPubDate DESC")
     List<Item> getAll();
 
     @Query("SELECT * FROM item Where mLink = (:link)")

@@ -53,7 +53,7 @@ public class DetailActivity extends AppCompatActivity {
                     .map(item -> "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" +
                             "<h3>" + item.mTitle + "</h3>" +
                             "<p/>" +
-                            "<p>" + item.mChannelName + "\t" + item.mPubDate + "</p>" +
+                            "<p>" + item.mChannelName + "\t" + item.mPubDateDetail + "</p>" +
                             "<p/>" +
                             item.mDes
                     )
