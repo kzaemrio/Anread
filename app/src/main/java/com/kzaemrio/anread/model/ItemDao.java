@@ -16,8 +16,8 @@ public interface ItemDao {
     @Query("SELECT * FROM item Where mLink = (:link)")
     Item query(String link);
 
-    @Query("SELECT * FROM item Where mChannelUrl = (:link)")
-    List<Item> queryBy(String link);
+    @Query("SELECT * FROM item Where mChannelUrl = (:channelUrl) Order by mPubDate DESC")
+    List<Item> queryBy(String channelUrl);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertReplace(Item... subscriptions);
@@ -27,13 +27,4 @@ public interface ItemDao {
 
     @Delete
     void delete(Item... items);
-
-    @Query("SELECT COUNT(mIsRead) FROM item Where mIsRead = 0")
-    int countUnRead();
-
-    @Query("SELECT COUNT(mChannelUrl) FROM item Where mChannelUrl = (:url)")
-    int countUnRead(String url);
-
-    @Query("SELECT COUNT(mIsFav) FROM item Where mIsFav = 1")
-    int countFav();
 }

@@ -1,6 +1,5 @@
 package com.kzaemrio.anread.adapter;
 
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,7 +67,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.Holder> {
             mBind.title.setText(item.mTitle);
             mBind.label.setText(item.mChannelName);
             mBind.time.setText(item.mPubDateItem);
-            mBind.content.setText(Html.fromHtml(getContent(item.mDes.trim())));
+            mBind.content.setText(item.mDesItem);
 
             boolean notRead = item.mIsRead == 0;
 
@@ -76,19 +75,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.Holder> {
             color(mBind.label, notRead, R.color.colorAccent);
             color(mBind.time, notRead, R.color.text_color_header);
             color(mBind.content, notRead, R.color.text_color_content);
-        }
-
-        private String getContent(String des) {
-            String start = "p>";
-            String end = "</p>";
-            int startIndex = des.indexOf(start);
-            int endIndex = des.indexOf(end);
-
-            if (startIndex > 0 && endIndex > 0) {
-                return des.substring(startIndex + start.length(), endIndex);
-            } else {
-                return des;
-            }
         }
 
         private void color(TextView title, boolean notRead, int colorId) {

@@ -48,12 +48,12 @@ public class ChannelListViewModel extends AndroidViewModel {
 
     public void delete(Channel channel) {
         Observable.just(channel)
-                .doOnNext(s -> {
+                .doOnNext(channelUrl -> {
                     AppDatabase database = AppDatabaseHolder.of(getApplication());
                     ItemDao itemDao = database.itemDao();
-                    List<Item> list = itemDao.queryBy(s.getUrl());
+                    List<Item> list = itemDao.queryBy(channelUrl.getUrl());
                     itemDao.delete(list.toArray(new Item[0]));
-                    database.channelDao().delete(s);
+                    database.channelDao().delete(channelUrl);
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

@@ -55,7 +55,7 @@ public class DetailActivity extends AppCompatActivity {
                             "<p/>" +
                             "<p>" + item.mChannelName + "\t" + item.mPubDateDetail + "</p>" +
                             "<p/>" +
-                            item.mDes
+                            item.mDesDetail
                     )
                     .doOnNext(html -> {
                         WebView webView = new WebView(this);
