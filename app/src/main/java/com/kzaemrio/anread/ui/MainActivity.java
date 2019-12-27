@@ -17,8 +17,6 @@ import androidx.lifecycle.ViewModelProviders;
 public class MainActivity extends AppCompatActivity {
 
     private MainViewModel mViewModel;
-    private MainView mView;
-    private Router mRouter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,13 +24,12 @@ public class MainActivity extends AppCompatActivity {
 
         mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
 
-        mView = MainView.create(this);
+        MainView view = MainView.create(this);
 
-        mRouter = Router.create(this);
-        mView.setCallback(new MainView.Callback() {
+        view.setCallback(new MainView.Callback() {
             @Override
             public void onAddSubscriptionClick() {
-                mRouter.toAddSubscription();
+                Router.toAddSubscription(MainActivity.this);
             }
 
             @Override
@@ -42,15 +39,15 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onItemClick(Item item) {
-                mRouter.toDetail(item.mLink);
+                Router.toDetail(MainActivity.this, item.mLink);
             }
 
         });
-        setContentView(mView.getContentView());
+        setContentView(view.getContentView());
 
-        mViewModel.isShowLoading().observe(this, mView::showLoading);
-        mViewModel.isShowAddSubscription().observe(this, mView::showAddSubscription);
-        mViewModel.getItemList().observe(this, mView::bind);
+        mViewModel.isShowLoading().observe(this, view::showLoading);
+        mViewModel.isShowAddSubscription().observe(this, view::showAddSubscription);
+        mViewModel.getItemList().observe(this, view::bind);
 
         mViewModel.init();
     }
@@ -68,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 mViewModel.readAll();
                 return true;
             case R.id.rss:
-                mRouter.toSubscriptionList();
+                Router.toSubscriptionList(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -94,29 +91,23 @@ public class MainActivity extends AppCompatActivity {
         int REQUEST_CODE_TO_DETAIL = 2;
         int REQUEST_CODE_SUBSCRIPTION_LIST = 3;
 
-        static Router create(Activity activity) {
-            return () -> activity;
-        }
-
-        Activity activity();
-
-        default void toAddSubscription() {
-            activity().startActivityForResult(
-                    AddSubscriptionActivity.createIntent(activity()),
+        static void toAddSubscription(Activity activity) {
+            activity.startActivityForResult(
+                    AddSubscriptionActivity.createIntent(activity),
                     REQUEST_CODE_ADD_SUBSCRIPTION
             );
         }
 
-        default void toDetail(String link) {
-            activity().startActivityForResult(
-                    DetailActivity.createIntent(activity(), link),
+        static void toDetail(Activity activity, String link) {
+            activity.startActivityForResult(
+                    DetailActivity.createIntent(activity, link),
                     REQUEST_CODE_TO_DETAIL
             );
         }
 
-        default void toSubscriptionList() {
-            activity().startActivityForResult(
-                    SubscriptionListActivity.createIntent(activity()),
+        static void toSubscriptionList(Activity activity) {
+            activity.startActivityForResult(
+                    SubscriptionListActivity.createIntent(activity),
                     REQUEST_CODE_SUBSCRIPTION_LIST
             );
         }
