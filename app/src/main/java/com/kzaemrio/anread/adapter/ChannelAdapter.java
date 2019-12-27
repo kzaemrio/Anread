@@ -9,6 +9,7 @@ import com.kzaemrio.anread.databinding.AdapterChannelBinding;
 import com.kzaemrio.anread.model.Channel;
 
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.core.util.Consumer;
@@ -18,11 +19,13 @@ import androidx.recyclerview.widget.RecyclerView;
 public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.Holder> {
 
     private final List<Channel> mList;
-    private final Consumer<Channel> mConsumer;
+    private final Consumer<Channel> mItemClickConsumer;
+    private final Consumer<Channel> mDeleteClickConsumer;
 
-    public ChannelAdapter(List<Channel> list, Consumer<Channel> consumer) {
+    public ChannelAdapter(List<Channel> list, Consumer<Channel> itemClickConsumer, Consumer<Channel> longClickConsumer) {
         mList = list;
-        mConsumer = consumer;
+        mItemClickConsumer = itemClickConsumer;
+        mDeleteClickConsumer = longClickConsumer;
     }
 
     @NonNull
@@ -40,7 +43,8 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.Holder> 
     public void onBindViewHolder(@NonNull Holder holder, int position) {
         Channel channel = mList.get(position);
         holder.bind(channel);
-        holder.itemView.setOnClickListener(v -> mConsumer.accept(channel));
+        holder.itemView.setOnClickListener(v -> mItemClickConsumer.accept(channel));
+        holder.delete.setOnClickListener(v -> mDeleteClickConsumer.accept(channel));
     }
 
     @Override
@@ -51,10 +55,13 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.Holder> 
     static class Holder extends RecyclerView.ViewHolder {
 
         private final AdapterChannelBinding mBinding;
+        public final View delete;
 
         private Holder(@NonNull View itemView) {
             super(itemView);
             mBinding = DataBindingUtil.bind(itemView);
+            Objects.requireNonNull(mBinding);
+            delete = mBinding.delete;
         }
 
         private void bind(Channel channel) {

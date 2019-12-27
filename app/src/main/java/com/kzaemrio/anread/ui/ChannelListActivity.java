@@ -9,8 +9,8 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.kzaemrio.anread.R;
-import com.kzaemrio.anread.adapter.SimpleDividerItemDecoration;
 import com.kzaemrio.anread.adapter.ChannelAdapter;
+import com.kzaemrio.anread.adapter.SimpleDividerItemDecoration;
 import com.kzaemrio.anread.model.Channel;
 
 import java.util.List;
@@ -38,10 +38,16 @@ public class ChannelListActivity extends AppCompatActivity {
 
         mViewModel = ViewModelProviders.of(this).get(ChannelListViewModel.class);
 
-        MvpView view = MvpView.create(this, channel -> {
-            setResult(RESULT_OK);
-            mViewModel.delete(channel);
-        });
+        MvpView view = MvpView.create(
+                this,
+                channel -> {
+
+                },
+                channel -> {
+                    setResult(RESULT_OK);
+                    mViewModel.delete(channel);
+                }
+        );
         setContentView(view.getContentView());
 
         mViewModel.getData().observe(this, view::bind);
@@ -83,7 +89,7 @@ public class ChannelListActivity extends AppCompatActivity {
     }
 
     private interface MvpView {
-        static MvpView create(Context context, Consumer<Channel> consumer) {
+        static MvpView create(Context context, Consumer<Channel> clickConsumer, Consumer<Channel> longClickConsumer) {
 
             RecyclerView recyclerView = new RecyclerView(context);
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -97,13 +103,13 @@ public class ChannelListActivity extends AppCompatActivity {
 
                 @Override
                 public void bind(List<Channel> channels) {
-                    recyclerView.setAdapter(new ChannelAdapter(channels, this::showDeleteDialog));
+                    recyclerView.setAdapter(new ChannelAdapter(channels, clickConsumer, this::showDeleteDialog));
                 }
 
                 private void showDeleteDialog(Channel channel) {
                     new AlertDialog.Builder(context)
                             .setTitle(channel.getTitle())
-                            .setPositiveButton(R.string.delete, (dialog, which) -> consumer.accept(channel))
+                            .setPositiveButton(R.string.delete, (dialog, which) -> longClickConsumer.accept(channel))
                             .setNegativeButton(R.string.cancel, (dialog, which) -> {
                             })
                             .create()

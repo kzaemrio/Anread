@@ -1,16 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<layout>
+<layout
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/selectableItemBackground"
-        android:paddingStart="@dimen/space_large"
-        android:paddingTop="@dimen/space_small"
-        android:paddingEnd="@dimen/space_large"
-        android:paddingBottom="@dimen/space_small"
-        android:textSize="@dimen/text_size_title" />
+        android:background="?attr/selectableItemBackground">
+
+        <ImageView
+            android:id="@+id/delete"
+            android:layout_width="48dp"
+            android:layout_height="0dp"
+            android:adjustViewBounds="true"
+            android:padding="@dimen/space_small"
+            android:src="@drawable/ic_delete_24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/space_large"
+            android:paddingTop="@dimen/space_small"
+            android:paddingEnd="@dimen/space_large"
+            android:paddingBottom="@dimen/space_small"
+            android:textSize="@dimen/text_size_title"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/delete"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
