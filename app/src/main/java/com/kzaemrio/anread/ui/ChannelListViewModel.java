@@ -5,10 +5,10 @@ import android.content.Context;
 
 import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
+import com.kzaemrio.anread.model.Channel;
+import com.kzaemrio.anread.model.ChannelDao;
 import com.kzaemrio.anread.model.Item;
 import com.kzaemrio.anread.model.ItemDao;
-import com.kzaemrio.anread.model.Subscription;
-import com.kzaemrio.anread.model.SubscriptionDao;
 
 import java.util.List;
 
@@ -20,45 +20,44 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
-public class SubscriptionListViewModel extends AndroidViewModel {
+public class ChannelListViewModel extends AndroidViewModel {
 
-    private MutableLiveData<List<Subscription>> mData;
+    private MutableLiveData<List<Channel>> mData;
 
-    public SubscriptionListViewModel(@NonNull Application application) {
+    public ChannelListViewModel(@NonNull Application application) {
         super(application);
     }
 
-    public LiveData<List<Subscription>> getData() {
+    public LiveData<List<Channel>> getData() {
         if (mData == null) {
             mData = new MutableLiveData<>();
         }
         return mData;
     }
 
-    public void loadSubscriptionList() {
+    public void loadChannelList() {
         Observable.<Context>just(getApplication())
                 .map(AppDatabaseHolder::of)
-                .map(AppDatabase::subscriptionDao)
-                .map(SubscriptionDao::getAll)
+                .map(AppDatabase::channelDao)
+                .map(ChannelDao::getAll)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .doOnNext(mData::setValue)
                 .subscribe();
     }
 
-    public void delete(Subscription subscription) {
-        Observable.just(subscription)
+    public void delete(Channel channel) {
+        Observable.just(channel)
                 .doOnNext(s -> {
                     AppDatabase database = AppDatabaseHolder.of(getApplication());
-                    ItemDao dao = database.itemDao();
-                    List<Item> list = dao.queryBy(s.getUrl());
-                    dao.delete(list
-                    .toArray(new Item[0]));
-                    database.subscriptionDao().delete(s);
+                    ItemDao itemDao = database.itemDao();
+                    List<Item> list = itemDao.queryBy(s.getUrl());
+                    itemDao.delete(list.toArray(new Item[0]));
+                    database.channelDao().delete(s);
                 })
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(s -> loadSubscriptionList())
+                .doOnNext(s -> loadChannelList())
                 .subscribe();
     }
 }

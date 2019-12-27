@@ -6,7 +6,7 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
 @Entity
-public class Subscription {
+public class Channel {
     @NonNull
     @PrimaryKey
     private String mUrl;
@@ -42,8 +42,8 @@ public class Subscription {
         mCreateTime = createTime;
     }
 
-    public static Subscription create(String url, String title) {
-        Subscription channel = new Subscription();
+    public static Channel create(String url, String title) {
+        Channel channel = new Channel();
         channel.mUrl = url;
         channel.mTitle = title;
         channel.mCreateTime = System.currentTimeMillis();

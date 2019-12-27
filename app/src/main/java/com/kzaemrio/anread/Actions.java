@@ -3,7 +3,7 @@ package com.kzaemrio.anread;
 import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.Feed;
 import com.kzaemrio.anread.model.Item;
-import com.kzaemrio.anread.model.Subscription;
+import com.kzaemrio.anread.model.Channel;
 
 import org.simpleframework.xml.core.Persister;
 
@@ -20,7 +20,7 @@ public interface Actions {
         Request request = new Request.Builder().url(url).build();
         Response response = new OkHttpClient.Builder().build().newCall(request).execute();
         Feed feed = new Persister().read(Feed.class, Objects.requireNonNull(response.body()).byteStream(), false);
-        Subscription channel = Subscription.create(url, feed.mFeedChannel.mTitle);
+        Channel channel = Channel.create(url, feed.mFeedChannel.mTitle);
         Item[] itemList = Observable.fromIterable(feed.mFeedChannel.mFeedItemList)
                 .map(i -> Item.create(i, channel.getTitle(), url))
                 .toList()
@@ -30,15 +30,15 @@ public interface Actions {
     }
 
     static void insertRssResult(AppDatabase database, RssResult rssResult) {
-        database.subscriptionDao().insert(rssResult.getSubscription());
+        database.channelDao().insert(rssResult.getChannel());
         database.itemDao().insertIgnore(rssResult.getItemArray());
     }
 
     interface RssResult {
-        static RssResult create(Subscription channel, Item[] itemList) {
+        static RssResult create(Channel channel, Item[] itemList) {
             return new RssResult() {
                 @Override
-                public Subscription getSubscription() {
+                public Channel getChannel() {
                     return channel;
                 }
 
@@ -49,7 +49,7 @@ public interface Actions {
             };
         }
 
-        Subscription getSubscription();
+        Channel getChannel();
 
         Item[] getItemArray();
     }

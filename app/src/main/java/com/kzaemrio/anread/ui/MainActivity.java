@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
         static void toAddSubscription(Activity activity) {
             activity.startActivityForResult(
-                    AddSubscriptionActivity.createIntent(activity),
+                    AddChannelActivity.createIntent(activity),
                     REQUEST_CODE_ADD_SUBSCRIPTION
             );
         }
@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
         static void toSubscriptionList(Activity activity) {
             activity.startActivityForResult(
-                    SubscriptionListActivity.createIntent(activity),
+                    ChannelListActivity.createIntent(activity),
                     REQUEST_CODE_SUBSCRIPTION_LIST
             );
         }

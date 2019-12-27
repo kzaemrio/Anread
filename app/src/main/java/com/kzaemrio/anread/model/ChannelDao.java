@@ -7,16 +7,15 @@ import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
-import io.reactivex.Observable;
 
 @Dao
-public interface SubscriptionDao {
-    @Query("SELECT * FROM subscription ORDER BY mCreateTime")
-    List<Subscription> getAll();
+public interface ChannelDao {
+    @Query("SELECT * FROM Channel ORDER BY mCreateTime")
+    List<Channel> getAll();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Subscription... subscriptions);
+    void insert(Channel... channels);
 
     @Delete
-    void delete(Subscription... subscriptions);
+    void delete(Channel... channels);
 }

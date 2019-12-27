@@ -2,7 +2,6 @@ package com.kzaemrio.anread.ui;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -11,8 +10,8 @@ import android.view.View;
 
 import com.kzaemrio.anread.R;
 import com.kzaemrio.anread.adapter.SimpleDividerItemDecoration;
-import com.kzaemrio.anread.adapter.SubscriptionAdapter;
-import com.kzaemrio.anread.model.Subscription;
+import com.kzaemrio.anread.adapter.ChannelAdapter;
+import com.kzaemrio.anread.model.Channel;
 
 import java.util.List;
 
@@ -25,28 +24,28 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class SubscriptionListActivity extends AppCompatActivity {
+public class ChannelListActivity extends AppCompatActivity {
 
-    private SubscriptionListViewModel mViewModel;
+    private ChannelListViewModel mViewModel;
 
     public static Intent createIntent(Activity activity) {
-        return new Intent(activity, SubscriptionListActivity.class);
+        return new Intent(activity, ChannelListActivity.class);
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mViewModel = ViewModelProviders.of(this).get(SubscriptionListViewModel.class);
+        mViewModel = ViewModelProviders.of(this).get(ChannelListViewModel.class);
 
-        MvpView view = MvpView.create(this, subscription -> {
+        MvpView view = MvpView.create(this, channel -> {
             setResult(RESULT_OK);
-            mViewModel.delete(subscription);
+            mViewModel.delete(channel);
         });
         setContentView(view.getContentView());
 
         mViewModel.getData().observe(this, view::bind);
-        mViewModel.loadSubscriptionList();
+        mViewModel.loadChannelList();
     }
 
     @Override
@@ -68,7 +67,7 @@ public class SubscriptionListActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Router.REQUEST_ADD_SUBSCRIPTION && resultCode == RESULT_OK) {
             setResult(RESULT_OK);
-            mViewModel.loadSubscriptionList();
+            mViewModel.loadChannelList();
         }
     }
 
@@ -77,14 +76,14 @@ public class SubscriptionListActivity extends AppCompatActivity {
 
         static void to(Activity activity) {
             activity.startActivityForResult(
-                    AddSubscriptionActivity.createIntent(activity),
+                    AddChannelActivity.createIntent(activity),
                     REQUEST_ADD_SUBSCRIPTION
             );
         }
     }
 
     private interface MvpView {
-        static MvpView create(Context context, Consumer<Subscription> consumer) {
+        static MvpView create(Context context, Consumer<Channel> consumer) {
 
             RecyclerView recyclerView = new RecyclerView(context);
             recyclerView.setLayoutManager(new LinearLayoutManager(context));
@@ -97,23 +96,15 @@ public class SubscriptionListActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void bind(List<Subscription> subscriptions) {
-                    recyclerView.setAdapter(new SubscriptionAdapter(subscriptions, this::showDeleteDialog));
+                public void bind(List<Channel> channels) {
+                    recyclerView.setAdapter(new ChannelAdapter(channels, this::showDeleteDialog));
                 }
 
-                private void showDeleteDialog(Subscription subscription) {
+                private void showDeleteDialog(Channel channel) {
                     new AlertDialog.Builder(context)
-                            .setTitle(subscription.getTitle())
-                            .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    consumer.accept(subscription);
-                                }
-                            })
-                            .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                }
+                            .setTitle(channel.getTitle())
+                            .setPositiveButton(R.string.delete, (dialog, which) -> consumer.accept(channel))
+                            .setNegativeButton(R.string.cancel, (dialog, which) -> {
                             })
                             .create()
                             .show();
@@ -123,6 +114,6 @@ public class SubscriptionListActivity extends AppCompatActivity {
 
         View getContentView();
 
-        void bind(List<Subscription> subscriptions);
+        void bind(List<Channel> channels);
     }
 }

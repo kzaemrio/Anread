@@ -7,7 +7,7 @@ import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
-import com.kzaemrio.anread.model.Subscription;
+import com.kzaemrio.anread.model.Channel;
 
 import java.util.List;
 
@@ -59,13 +59,13 @@ public class MainViewModel extends AndroidViewModel {
         Observable.<Context>just(getApplication())
                 .doOnNext(context -> {
                     AppDatabase database = AppDatabaseHolder.of(context);
-                    List<Subscription> list = database.subscriptionDao().getAll();
+                    List<Channel> list = database.channelDao().getAll();
 
                     if (list.isEmpty()) {
                         mIsShowAddSubscription.postValue(true);
                     } else {
                         Observable.fromIterable(list)
-                                .map(Subscription::getUrl)
+                                .map(Channel::getUrl)
                                 .map(Actions::getRssResult)
                                 .doOnNext(rssResult -> Actions.insertRssResult(database, rssResult))
                                 .subscribe();

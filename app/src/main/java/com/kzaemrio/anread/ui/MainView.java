@@ -10,7 +10,7 @@ import com.kzaemrio.anread.adapter.SimpleDividerItemDecoration;
 import com.kzaemrio.anread.adapter.SimpleOffsetItemDecoration;
 import com.kzaemrio.anread.databinding.ActivityMainBinding;
 import com.kzaemrio.anread.model.Item;
-import com.kzaemrio.anread.model.Subscription;
+import com.kzaemrio.anread.model.Channel;
 
 import java.util.List;
 
@@ -100,11 +100,11 @@ public interface MainView {
         List<ViewItemSub> getViewItemSubList();
 
         interface ViewItemSub {
-            static ViewItemSub create(Subscription subscription, int countUnRead) {
+            static ViewItemSub create(Channel channel, int countUnRead) {
                 return new ViewItemSub() {
                     @Override
-                    public Subscription getSubscription() {
-                        return subscription;
+                    public Channel getSubscription() {
+                        return channel;
                     }
 
                     @Override
@@ -114,7 +114,7 @@ public interface MainView {
                 };
             }
 
-            Subscription getSubscription();
+            Channel getSubscription();
 
             int getUnReadCount();
         }

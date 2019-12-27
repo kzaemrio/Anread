@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 
 import com.kzaemrio.anread.Actions;
-import com.kzaemrio.anread.databinding.ActivityAddSubscriptionBinding;
+import com.kzaemrio.anread.databinding.ActivityAddChannelBinding;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 
 import java.util.Objects;
@@ -22,16 +22,16 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
-public class AddSubscriptionActivity extends AppCompatActivity {
+public class AddChannelActivity extends AppCompatActivity {
     public static Intent createIntent(Context context) {
-        return new Intent(context, AddSubscriptionActivity.class);
+        return new Intent(context, AddChannelActivity.class);
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AddSubscriptionView view = AddSubscriptionView.create(this);
+        AddChannelView view = AddChannelView.create(this);
         view.setCallback(() -> {
             view.showLoading(true);
 
@@ -43,7 +43,7 @@ public class AddSubscriptionActivity extends AppCompatActivity {
                     .observeOn(AndroidSchedulers.mainThread())
                     .doOnNext(url -> {
                         view.showLoading(false);
-                        setResult(RESULT_OK, new Intent().putExtra("url", url.getSubscription().getUrl()));
+                        setResult(RESULT_OK, new Intent().putExtra("url", url.getChannel().getUrl()));
                         finish();
                     })
                     .subscribe();
@@ -52,9 +52,9 @@ public class AddSubscriptionActivity extends AppCompatActivity {
         setContentView(view.getContentView());
     }
 
-    private interface AddSubscriptionView {
-        static AddSubscriptionView create(Context context) {
-            ActivityAddSubscriptionBinding binding = ActivityAddSubscriptionBinding.inflate(LayoutInflater.from(context));
+    private interface AddChannelView {
+        static AddChannelView create(Context context) {
+            ActivityAddChannelBinding binding = ActivityAddChannelBinding.inflate(LayoutInflater.from(context));
 
             BehaviorSubject<Boolean> isInputEmpty = BehaviorSubject.createDefault(true);
             BehaviorSubject<Boolean> isLoadingShow = BehaviorSubject.createDefault(false);
@@ -82,7 +82,7 @@ public class AddSubscriptionActivity extends AppCompatActivity {
 
             binding.input.setText("https://www.ithome.com/rss/");
 
-            return new AddSubscriptionView() {
+            return new AddChannelView() {
                 @Override
                 public View getContentView() {
                     return binding.getRoot();
