@@ -1,15 +1,21 @@
 package com.kzaemrio.anread.ui;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import com.kzaemrio.anread.R;
+import com.kzaemrio.anread.databinding.ActivityDetailBinding;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
 import com.kzaemrio.anread.model.ItemDao;
@@ -36,6 +42,10 @@ public class DetailActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        DetailView detailView = DetailView.create(this);
+        setContentView(detailView.getContentView());
+
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         String link = getIntent().getStringExtra(EXTRA_LINK);
         if (!TextUtils.isEmpty(link)) {
@@ -57,11 +67,7 @@ public class DetailActivity extends AppCompatActivity {
                             "<p/>" +
                             item.mDesDetail
                     )
-                    .doOnNext(html -> {
-                        WebView webView = new WebView(this);
-                        webView.loadDataWithBaseURL("file:///android_asset/", html, "text/html", "UTF-8", null);
-                        setContentView(webView);
-                    })
+                    .doOnNext(detailView::bind)
                     .subscribe();
         }
     }
@@ -98,5 +104,47 @@ public class DetailActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private interface DetailView {
+        static DetailView create(Context context) {
+            ActivityDetailBinding binding = ActivityDetailBinding.inflate(LayoutInflater.from(context));
+            return new DetailView() {
+                @Override
+                public View getContentView() {
+                    return binding.getRoot();
+                }
+
+                @Override
+                public void bind(String html) {
+                    binding.web.setWebViewClient(new WebViewClient() {
+                        @Override
+                        public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                            super.onPageStarted(view, url, favicon);
+                            binding.swipe.setRefreshing(true);
+                        }
+
+                        @Override
+                        public void onPageFinished(WebView view, String url) {
+                            super.onPageFinished(view, url);
+                            binding.swipe.setRefreshing(false);
+                            binding.swipe.setEnabled(false);
+                        }
+                    });
+                    binding.web.loadDataWithBaseURL(
+                            "file:///android_asset/",
+                            html,
+                            "text/html",
+                            "UTF-8",
+                            null
+                    );
+                }
+
+            };
+        }
+
+        View getContentView();
+
+        void bind(String html);
     }
 }
