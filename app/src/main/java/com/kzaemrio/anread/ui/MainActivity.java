@@ -73,7 +73,9 @@ public class MainActivity extends BaseActivity {
         boolean visible = isShow != null && !isShow;
         MenuItem item = menu.findItem(R.id.sync);
         Boolean isSyncOn = mViewModel.getIsSyncOn().getValue();
-        item.setIcon(isSyncOn != null && isSyncOn ? R.drawable.ic_sync_24dp : R.drawable.ic_sync_disabled_24dp);
+        boolean isSyncOnValue = isSyncOn != null && isSyncOn;
+        item.setTitle(isSyncOnValue ? R.string.menu_to_sync_cancel : R.string.menu_to_sync);
+        item.setIcon(isSyncOnValue ? R.drawable.ic_sync_24dp : R.drawable.ic_sync_disabled_24dp);
         item.setVisible(visible);
         menu.findItem(R.id.read).setVisible(visible);
         menu.findItem(R.id.rss).setVisible(visible);
