@@ -20,4 +20,6 @@
     <string name="label_feed_detail" />
     <string name="label_subscription_list">管理订阅源</string>
     <string name="menu_sync">自动同步</string>
+    <string name="toast_sync_on">每半小时自动同步</string>
+    <string name="toast_sync_cancel">自动同步关闭</string>
 </resources>

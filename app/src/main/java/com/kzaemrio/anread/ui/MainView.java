@@ -4,13 +4,15 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.google.android.material.snackbar.Snackbar;
+import com.kzaemrio.anread.R;
 import com.kzaemrio.anread.adapter.AddSubscriptionAdapter;
 import com.kzaemrio.anread.adapter.MainAdapter;
 import com.kzaemrio.anread.adapter.SimpleDividerItemDecoration;
 import com.kzaemrio.anread.adapter.SimpleOffsetItemDecoration;
 import com.kzaemrio.anread.databinding.ActivityMainBinding;
-import com.kzaemrio.anread.model.Item;
 import com.kzaemrio.anread.model.Channel;
+import com.kzaemrio.anread.model.Item;
 
 import java.util.List;
 
@@ -48,6 +50,15 @@ public interface MainView {
             }
 
             @Override
+            public void showSyncToast(boolean is) {
+                Snackbar.make(
+                        binding.getRoot(),
+                        is ? R.string.toast_sync_on : R.string.toast_sync_cancel,
+                        Snackbar.LENGTH_SHORT
+                ).show();
+            }
+
+            @Override
             public void setCallback(Callback callback) {
                 mCallback = callback;
                 binding.swipe.setOnRefreshListener(callback::onRefresh);
@@ -64,6 +75,8 @@ public interface MainView {
     void showAddSubscription(boolean isShow);
 
     void bind(List<Item> items);
+
+    void showSyncToast(boolean is);
 
     interface Callback {
         void onAddSubscriptionClick();

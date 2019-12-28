@@ -50,7 +50,13 @@ public class MainActivity extends BaseActivity {
             view.showAddSubscription(is);
         });
         mViewModel.getItemList().observe(this, view::bind);
-        mViewModel.getIsSyncOn().observe(this, is -> invalidateOptionsMenu());
+        mViewModel.getIsSyncOn().observe(this, is -> {
+            invalidateOptionsMenu();
+
+            if (mViewModel.getItemList().getValue() != null) {
+                view.showSyncToast(is);
+            }
+        });
 
         mViewModel.init();
     }
