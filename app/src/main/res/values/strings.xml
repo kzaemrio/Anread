@@ -19,4 +19,5 @@
     <string name="label_add_subscription">添加订阅源</string>
     <string name="label_feed_detail" />
     <string name="label_subscription_list">管理订阅源</string>
+    <string name="menu_sync">自动同步</string>
 </resources>

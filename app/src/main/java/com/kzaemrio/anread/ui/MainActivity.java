@@ -50,6 +50,7 @@ public class MainActivity extends BaseActivity {
             view.showAddSubscription(is);
         });
         mViewModel.getItemList().observe(this, view::bind);
+        mViewModel.getIsSyncOn().observe(this, is -> invalidateOptionsMenu());
 
         mViewModel.init();
     }
@@ -64,6 +65,10 @@ public class MainActivity extends BaseActivity {
         getMenuInflater().inflate(R.menu.main, menu);
         Boolean isShow = mViewModel.isShowAddSubscription().getValue();
         boolean visible = isShow != null && !isShow;
+        MenuItem item = menu.findItem(R.id.sync);
+        Boolean isSyncOn = mViewModel.getIsSyncOn().getValue();
+        item.setIcon(isSyncOn != null && isSyncOn ? R.drawable.ic_sync_24dp : R.drawable.ic_sync_disabled_24dp);
+        item.setVisible(visible);
         menu.findItem(R.id.read).setVisible(visible);
         menu.findItem(R.id.rss).setVisible(visible);
         return super.onCreateOptionsMenu(menu);
@@ -77,6 +82,9 @@ public class MainActivity extends BaseActivity {
                 return true;
             case R.id.rss:
                 Router.toSubscriptionList(this);
+                return true;
+            case R.id.sync:
+                mViewModel.switchSync();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
