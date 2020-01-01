@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.kzaemrio.anread.Actions;
+import com.kzaemrio.anread.CacheCleanWorker;
 import com.kzaemrio.anread.CacheFeedWorker;
 import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
@@ -34,6 +35,7 @@ public class MainViewModel extends AndroidViewModel {
 
     public MainViewModel(@NonNull Application application) {
         super(application);
+        CacheCleanWorker.work(application.getApplicationContext());
     }
 
 

@@ -19,6 +19,9 @@ public interface ItemDao {
     @Query("SELECT * FROM item Where mChannelUrl = (:channelUrl) Order by mPubDate DESC")
     List<Item> queryBy(String channelUrl);
 
+    @Query("SELECT * FROM item Where mPubDate < (:time)")
+    Item[] queryBy(long time);
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertReplace(Item... subscriptions);
 
