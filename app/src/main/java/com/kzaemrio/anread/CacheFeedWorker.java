@@ -8,6 +8,9 @@ import com.kzaemrio.anread.model.Channel;
 import com.kzaemrio.anread.model.ChannelDao;
 import com.kzaemrio.anread.model.Item;
 
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
@@ -18,7 +21,6 @@ import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
-import io.reactivex.Observable;
 
 public class CacheFeedWorker extends Worker {
 
@@ -57,19 +59,22 @@ public class CacheFeedWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        AppDatabase database = AppDatabaseHolder.of(getApplicationContext());
-        Observable.just(database)
-                .map(AppDatabase::channelDao)
-                .map(ChannelDao::getAll)
-                .flatMap(Observable::fromIterable)
-                .map(Channel::getUrl)
-                .map(Actions::getRssResult)
-                .map(Actions.RssResult::getItemArray)
-                .flatMap(Observable::fromArray)
-                .toList()
-                .map(list -> list.toArray(new Item[0]))
-                .doOnSuccess(array -> database.itemDao().insertIgnore(array))
-                .subscribe();
-        return Result.success();
+        try {
+            AppDatabase database = AppDatabaseHolder.of(getApplicationContext());
+            ChannelDao dao = database.channelDao();
+            List<Channel> all = dao.getAll();
+            List<Item> itemList = new LinkedList<>();
+            for (Channel channel : all) {
+                Actions.RssResult result = Actions.getRssResult(channel.getUrl());
+                Item[] itemArray = result.getItemArray();
+                Collections.addAll(itemList, itemArray);
+            }
+            Item[] items = itemList.toArray(new Item[0]);
+            database.itemDao().insertIgnore(items);
+            return Result.success();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.failure();
+        }
     }
 }
