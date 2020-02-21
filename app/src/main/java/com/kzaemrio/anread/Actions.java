@@ -3,13 +3,15 @@ package com.kzaemrio.anread;
 import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.Channel;
 import com.kzaemrio.anread.model.Feed;
+import com.kzaemrio.anread.model.FeedItem;
 import com.kzaemrio.anread.model.Item;
 
 import org.simpleframework.xml.core.Persister;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 
-import io.reactivex.Observable;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -21,12 +23,12 @@ public interface Actions {
         Response response = new OkHttpClient.Builder().build().newCall(request).execute();
         Feed feed = new Persister().read(Feed.class, Objects.requireNonNull(response.body()).byteStream(), false);
         Channel channel = Channel.create(url, feed.mFeedChannel.mTitle);
-        Item[] itemList = Observable.fromIterable(feed.mFeedChannel.mFeedItemList)
-                .map(feedItem -> Item.create(feedItem, channel.getTitle(), url))
-                .toList()
-                .map(list -> list.toArray(new Item[0]))
-                .blockingGet();
-        return RssResult.create(channel, itemList);
+        List<Item> list = new LinkedList<>();
+        for (FeedItem feedItem : feed.mFeedChannel.mFeedItemList) {
+            list.add(Item.create(feedItem, channel.getTitle(), url));
+        }
+        Item[] itemArray = list.toArray(new Item[0]);
+        return RssResult.create(channel, itemArray);
     }
 
     static void insertRssResult(AppDatabase database, RssResult rssResult) {
