@@ -70,8 +70,7 @@ public class Item {
         int startIndex = des.indexOf(start);
         int endIndex = des.indexOf(end);
 
-        if (startIndex >= 0 && endIndex >= 0) {
-
+        if (startIndex >= 0 && endIndex > startIndex) {
             String substring = des.substring(startIndex + start.length(), endIndex);
             if (Html.fromHtml(substring).length() < 60) {
                 return substring + "\n" + getDes(des.substring(endIndex + end.length()));
