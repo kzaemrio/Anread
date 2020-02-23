@@ -16,12 +16,10 @@ import java.util.List;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
+import androidx.arch.core.executor.ArchTaskExecutor;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
 
 public class MainViewModel extends AndroidViewModel {
 
@@ -87,44 +85,41 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void init() {
-        Observable.<Context>just(getApplication())
-                .doOnNext(context -> {
-                    AppDatabase database = AppDatabaseHolder.of(context);
-                    List<Channel> list = database.channelDao().getAll();
+        mIsShowLoading.setValue(true);
+        ArchTaskExecutor.getInstance().executeOnDiskIO(() -> {
+            AppDatabase database = AppDatabaseHolder.of(getApplication());
+            List<Channel> list = database.channelDao().getAll();
 
-                    if (list.isEmpty()) {
-                        mIsShowAddSubscription.postValue(true);
-                    } else {
-                        Observable.fromIterable(list)
-                                .map(Channel::getUrl)
-                                .map(Actions::getRssResult)
-                                .doOnNext(rssResult -> Actions.insertRssResult(database, rssResult))
-                                .subscribe();
-
-                        mIsShowAddSubscription.postValue(false);
-                        mItemList.postValue(database.itemDao().getAll());
+            if (list.isEmpty()) {
+                mIsShowAddSubscription.postValue(true);
+            } else {
+                try {
+                    for (Channel channel : list) {
+                        String url = channel.getUrl();
+                        Actions.RssResult result = Actions.getRssResult(url);
+                        Actions.insertRssResult(database, result);
                     }
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnSubscribe(d -> mIsShowLoading.postValue(true))
-                .doOnComplete(() -> mIsShowLoading.postValue(false))
-                .subscribe();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                mIsShowAddSubscription.postValue(false);
+                mItemList.postValue(database.itemDao().getAll());
+            }
+            mIsShowLoading.postValue(false);
+        });
     }
 
     public void readAll() {
         if (mItemList != null && mItemList.getValue() != null) {
-            Observable.fromIterable(mItemList.getValue())
-                    .doOnNext(item -> item.mIsRead = 1)
-                    .toList()
-                    .doOnSuccess(list -> {
-                        mItemList.postValue(list);
-                        AppDatabaseHolder.of(getApplication()).itemDao().insertReplace(list.toArray(new Item[0]));
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-
-                    .subscribe();
+            List<Item> list = mItemList.getValue();
+            for (Item item : list) {
+                item.mIsRead = 1;
+            }
+            mItemList.setValue(list);
+            ArchTaskExecutor.getInstance().executeOnDiskIO(() -> {
+                AppDatabaseHolder.of(getApplication()).itemDao().insertReplace(list.toArray(new Item[0]));
+            });
         }
     }
 }
