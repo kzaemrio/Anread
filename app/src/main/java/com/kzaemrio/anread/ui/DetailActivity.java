@@ -22,15 +22,14 @@ import com.kzaemrio.anread.model.ItemDao;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+import androidx.arch.core.executor.ArchTaskExecutor;
+import androidx.lifecycle.MutableLiveData;
 
 public class DetailActivity extends BaseActivity {
 
     private static final String EXTRA_LINK = "EXTRA_LINK";
 
-    private Item mItem;
+    private MutableLiveData<Item> mItem;
 
     public static Intent createIntent(Activity activity, String link) {
         return new Intent(activity, DetailActivity.class).putExtra(EXTRA_LINK, link);
@@ -43,34 +42,36 @@ public class DetailActivity extends BaseActivity {
         DetailView detailView = DetailView.create(this);
         setContentView(detailView.getContentView());
 
+        mItem = new MutableLiveData<>();
+        mItem.observe(this, item -> {
+            invalidateOptionsMenu();
+            String html = "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" +
+                    "<h3>" + item.mTitle + "</h3>" +
+                    "<p/>" +
+                    "<p>" + item.mChannelName + "\t" + item.mPubDateDetail + "</p>" +
+                    "<p/>" +
+                    item.mDesDetail;
+            detailView.bind(html);
+        });
+
         String link = getIntent().getStringExtra(EXTRA_LINK);
         if (!TextUtils.isEmpty(link)) {
-            Observable.just(link)
-                    .map(url -> {
-                        ItemDao dao = AppDatabaseHolder.of(this).itemDao();
-                        Item item = dao.query(link);
-                        item.mIsRead = 1;
-                        dao.insertReplace(item);
-                        return item;
-                    })
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext(item -> mItem = item)
-                    .map(item -> "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" +
-                            "<h3>" + item.mTitle + "</h3>" +
-                            "<p/>" +
-                            "<p>" + item.mChannelName + "\t" + item.mPubDateDetail + "</p>" +
-                            "<p/>" +
-                            item.mDesDetail
-                    )
-                    .doOnNext(detailView::bind)
-                    .subscribe();
+            ArchTaskExecutor.getInstance().executeOnDiskIO(() -> {
+                ItemDao dao = AppDatabaseHolder.of(this).itemDao();
+                Item item = dao.query(link);
+                item.mIsRead = 1;
+                dao.insertReplace(item);
+                mItem.postValue(item);
+            });
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.detail, menu);
+        boolean isShowMenu = mItem.getValue() != null;
+        menu.findItem(R.id.open).setVisible(isShowMenu);
+        menu.findItem(R.id.share).setVisible(isShowMenu);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -80,7 +81,7 @@ public class DetailActivity extends BaseActivity {
             case R.id.open:
                 Intent openIntent = new Intent();
                 openIntent.setAction(Intent.ACTION_VIEW);
-                openIntent.setData(Uri.parse(mItem.mLink));
+                openIntent.setData(Uri.parse(mItem.getValue().mLink));
                 if (openIntent.resolveActivity(getPackageManager()) != null) {
                     startActivity(Intent.createChooser(openIntent, getString(R.string.action_open)));
                 }
@@ -88,7 +89,7 @@ public class DetailActivity extends BaseActivity {
             case R.id.share:
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                String value = mItem.mTitle + "\n---\n" + mItem.mLink;
+                String value = mItem.getValue().mTitle + "\n---\n" + mItem.getValue().mLink;
                 sendIntent.putExtra(Intent.EXTRA_TEXT, value);
                 sendIntent.setType("text/plain");
                 if (sendIntent.resolveActivity(getPackageManager()) != null) {
