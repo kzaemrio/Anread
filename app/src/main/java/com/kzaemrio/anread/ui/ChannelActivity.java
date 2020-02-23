@@ -7,22 +7,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 
-import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.adapter.MainAdapter;
 import com.kzaemrio.anread.adapter.SimpleDividerItemDecoration;
 import com.kzaemrio.anread.adapter.SimpleOffsetItemDecoration;
 import com.kzaemrio.anread.databinding.ActivityChannelBinding;
-import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
-import com.kzaemrio.anread.model.ItemDao;
 
 import java.util.List;
-import java.util.Objects;
 
 import androidx.annotation.Nullable;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+import androidx.lifecycle.ViewModelProviders;
 
 public class ChannelActivity extends BaseActivity {
 
@@ -35,10 +29,11 @@ public class ChannelActivity extends BaseActivity {
                 .putExtra(EXTRA_URL, channelUrl);
     }
 
+    private ChannelViewModel mViewModel;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         Intent intent = getIntent();
         setTitle(intent.getStringExtra(EXTRA_TITLE));
@@ -46,20 +41,14 @@ public class ChannelActivity extends BaseActivity {
         ChannelView channelView = ChannelView.create(this);
         setContentView(channelView.getContentView());
 
-        Runnable refreshAction = () -> Observable.just(Objects.requireNonNull(intent.getStringExtra(EXTRA_URL)))
-                .map(Actions::getRssResult)
-                .map(result -> {
-                    ItemDao itemDao = AppDatabaseHolder.of(this).itemDao();
-                    itemDao.insertIgnore(result.getItemArray());
-                    return itemDao.queryBy(result.getChannel().getUrl());
-                })
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .doOnNext(channelView::bind)
-                .doOnNext(i -> setResult(RESULT_OK))
-                .doOnSubscribe(d -> channelView.showLoading(true))
-                .doOnComplete(() -> channelView.showLoading(false))
-                .subscribe();
+        mViewModel = ViewModelProviders.of(this).get(ChannelViewModel.class);
+        mViewModel.getList().observe(this, items -> {
+            channelView.bind(items);
+            setResult(RESULT_OK);
+        });
+        mViewModel.getIsShowLoading().observe(this, channelView::showLoading);
+
+        String url = intent.getStringExtra(EXTRA_URL);
 
         channelView.setCallback(new ChannelView.Callback() {
             @Override
@@ -70,12 +59,11 @@ public class ChannelActivity extends BaseActivity {
 
             @Override
             public void onRefresh() {
-                refreshAction.run();
+                mViewModel.requestList(url);
             }
         });
 
-        refreshAction.run();
-
+        mViewModel.requestList(url);
     }
 
     private interface Router {
