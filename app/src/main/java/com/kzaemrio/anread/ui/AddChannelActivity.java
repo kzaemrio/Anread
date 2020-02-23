@@ -13,13 +13,8 @@ import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.databinding.ActivityAddChannelBinding;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 
-import java.util.Objects;
-
 import androidx.annotation.Nullable;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.BehaviorSubject;
+import androidx.arch.core.executor.ArchTaskExecutor;
 
 public class AddChannelActivity extends BaseActivity {
     public static Intent createIntent(Context context) {
@@ -33,19 +28,26 @@ public class AddChannelActivity extends BaseActivity {
         AddChannelView view = AddChannelView.create(this);
         view.setCallback(() -> {
             view.showLoading(true);
-
-            Observable.just(Objects.requireNonNull(view.getInput()))
-                    .map(Objects::toString)
-                    .map(Actions::getRssResult)
-                    .doOnNext(rssResult -> Actions.insertRssResult(AppDatabaseHolder.of(getApplicationContext().getApplicationContext()), rssResult))
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnNext(url -> {
+            String input = view.getInput().toString();
+            ArchTaskExecutor.getInstance().executeOnDiskIO(() -> {
+                try {
+                    Actions.RssResult result = Actions.getRssResult(input);
+                    Actions.insertRssResult(
+                            AppDatabaseHolder.of(getApplication()),
+                            result
+                    );
+                    ArchTaskExecutor.getInstance().postToMainThread(() -> {
                         view.showLoading(false);
-                        setResult(RESULT_OK, new Intent().putExtra("url", url.getChannel().getUrl()));
+                        setResult(RESULT_OK, new Intent().putExtra(
+                                "url",
+                                result.getChannel().getUrl())
+                        );
                         finish();
-                    })
-                    .subscribe();
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            });
         });
 
         setContentView(view.getContentView());
@@ -55,13 +57,6 @@ public class AddChannelActivity extends BaseActivity {
         static AddChannelView create(Context context) {
             ActivityAddChannelBinding binding = ActivityAddChannelBinding.inflate(LayoutInflater.from(context));
 
-            BehaviorSubject<Boolean> isInputEmpty = BehaviorSubject.createDefault(true);
-            BehaviorSubject<Boolean> isLoadingShow = BehaviorSubject.createDefault(false);
-
-            Observable.merge(isInputEmpty, isLoadingShow)
-                    .doOnNext(i -> binding.bt.setEnabled(!isInputEmpty.getValue() && !isLoadingShow.getValue()))
-                    .subscribe();
-
             binding.input.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -70,7 +65,7 @@ public class AddChannelActivity extends BaseActivity {
 
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count) {
-                    isInputEmpty.onNext(TextUtils.isEmpty(s));
+                    binding.bt.setEnabled(!TextUtils.isEmpty(s));
                 }
 
                 @Override
@@ -99,7 +94,7 @@ public class AddChannelActivity extends BaseActivity {
 
                 @Override
                 public void showLoading(boolean isShow) {
-                    isLoadingShow.onNext(isShow);
+                    binding.bt.setEnabled(!isShow);
                     binding.progress.setVisibility(isShow ? View.VISIBLE : View.INVISIBLE);
                 }
             };
