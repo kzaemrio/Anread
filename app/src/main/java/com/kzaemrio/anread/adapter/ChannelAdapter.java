@@ -13,7 +13,6 @@ import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.core.util.Consumer;
-import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.Holder> {
@@ -59,7 +58,7 @@ public class ChannelAdapter extends RecyclerView.Adapter<ChannelAdapter.Holder> 
 
         private Holder(@NonNull View itemView) {
             super(itemView);
-            mBinding = DataBindingUtil.bind(itemView);
+            mBinding = AdapterChannelBinding.bind(itemView);
             Objects.requireNonNull(mBinding);
             delete = mBinding.delete;
         }

@@ -14,7 +14,6 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Consumer;
-import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class MainAdapter extends RecyclerView.Adapter<MainAdapter.Holder> {
@@ -60,7 +59,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.Holder> {
 
         private Holder(@NonNull View itemView) {
             super(itemView);
-            mBind = DataBindingUtil.bind(itemView);
+            mBind = AdapterMainItemBinding.bind(itemView);
         }
 
         private void bind(Item item) {

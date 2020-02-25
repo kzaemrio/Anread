@@ -22,7 +22,7 @@ android {
         sourceCompatibility = 1.8
         targetCompatibility = 1.8
     }
-    dataBinding {
+    viewBinding {
         enabled true
     }
 }
@@ -41,7 +41,7 @@ buildscript {
 apply plugin: 'com.getkeepsafe.dexcount'
 
 dependencies {
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 }

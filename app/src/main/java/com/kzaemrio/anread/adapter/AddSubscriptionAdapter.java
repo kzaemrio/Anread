@@ -9,7 +9,6 @@ import com.kzaemrio.anread.databinding.AdapterAddChannelBinding;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
-import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class AddSubscriptionAdapter extends SingleViewAdapter {
@@ -25,7 +24,7 @@ public class AddSubscriptionAdapter extends SingleViewAdapter {
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         RecyclerView.ViewHolder holder = super.onCreateViewHolder(parent, viewType);
-        AdapterAddChannelBinding bind = DataBindingUtil.bind(holder.itemView);
+        AdapterAddChannelBinding bind = AdapterAddChannelBinding.bind(holder.itemView);
         Objects.requireNonNull(bind);
         View.OnClickListener onClickListener = v -> mOnAddSubscriptionClickAction.run();
         bind.text.setOnClickListener(onClickListener);
