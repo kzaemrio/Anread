@@ -69,4 +69,6 @@ dependencies {
     implementation("org.simpleframework:simple-xml:2.7.1") {
         exclude module: 'xpp3'
     }
+
+    implementation 'org.antlr:antlr4-runtime:4.8'
 }

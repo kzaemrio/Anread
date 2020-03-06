@@ -1,7 +1,12 @@
 package com.kzaemrio.anread.model;
 
-import android.text.Html;
+import com.kzaemrio.anread.xml.XMLLexer;
+import com.kzaemrio.anread.xml.XMLParser;
+import com.kzaemrio.anread.xml.XMLParserBaseListener;
 
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.threeten.bp.ZoneId;
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
@@ -50,7 +55,7 @@ public class Item {
         item.mTitle = feedItem.mTitle.trim();
 
         item.mDesDetail = feedItem.mDes.trim();
-        item.mDesItem = Html.fromHtml(getDes(item.mDesDetail)).toString();
+        item.mDesItem = parseDesItem(item.mDesDetail);
 
         ZonedDateTime originalZonedDateTime = getZonedDateTime(feedItem.mPubDate.trim());
         ZonedDateTime fixedZonedDateTime = originalZonedDateTime.withZoneSameInstant(ZoneId.systemDefault());
@@ -64,22 +69,24 @@ public class Item {
         return item;
     }
 
-    private static String getDes(String des) {
-        String start = "<p>";
-        String end = "</p>";
-        int startIndex = des.indexOf(start);
-        int endIndex = des.indexOf(end);
-
-        if (startIndex >= 0 && endIndex > startIndex) {
-            String substring = des.substring(startIndex + start.length(), endIndex);
-            if (Html.fromHtml(substring).length() < 60) {
-                return substring + "\n" + getDes(des.substring(endIndex + end.length()));
-            } else {
-                return substring;
-            }
-        } else {
-            return des;
-        }
+    private static String parseDesItem(String des) {
+        String input = "<p>" + des.replace("<![CDATA[", "<p>")
+                .replace("]]>", "</p>")
+                + "</p>";
+        StringBuilder builder = new StringBuilder();
+        new ParseTreeWalker().walk(
+                new XMLParserBaseListener() {
+                    @Override
+                    public void enterChardata(XMLParser.ChardataContext ctx) {
+                        super.enterChardata(ctx);
+                        if (builder.length() < 50) {
+                            builder.append(ctx.getText().trim());
+                        }
+                    }
+                },
+                new XMLParser(new CommonTokenStream(new XMLLexer(CharStreams.fromString(input)))).document()
+        );
+        return builder.toString();
     }
 
     private static ZonedDateTime getZonedDateTime(String time) {
