@@ -1,12 +1,10 @@
 package com.kzaemrio.anread.model;
 
 import com.kzaemrio.anread.xml.XMLLexer;
-import com.kzaemrio.anread.xml.XMLParser;
-import com.kzaemrio.anread.xml.XMLParserBaseListener;
 
 import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenSource;
 import org.threeten.bp.ZoneId;
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
@@ -70,22 +68,17 @@ public class Item {
     }
 
     private static String parseDesItem(String des) {
-        String input = "<p>" + des.replace("<![CDATA[", "<p>")
-                .replace("]]>", "</p>")
-                + "</p>";
         StringBuilder builder = new StringBuilder();
-        new ParseTreeWalker().walk(
-                new XMLParserBaseListener() {
-                    @Override
-                    public void enterChardata(XMLParser.ChardataContext ctx) {
-                        super.enterChardata(ctx);
-                        if (builder.length() < 50) {
-                            builder.append(ctx.getText().trim());
-                        }
-                    }
-                },
-                new XMLParser(new CommonTokenStream(new XMLLexer(CharStreams.fromString(input)))).document()
-        );
+        TokenSource lexer = new XMLLexer(CharStreams.fromString(des));
+
+        for (Token token = lexer.nextToken(); token.getType() != Token.EOF; token = lexer.nextToken()) {
+            if (token.getType() == XMLLexer.TEXT) {
+                builder.append(token.getText());
+            }
+            if (builder.length() > 50) {
+                break;
+            }
+        }
         return builder.toString();
     }
 
