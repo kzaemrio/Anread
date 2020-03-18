@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -103,6 +104,10 @@ public class DetailActivity extends BaseActivity {
     private interface DetailView {
         static DetailView create(Context context) {
             ActivityDetailBinding binding = ActivityDetailBinding.inflate(LayoutInflater.from(context));
+            WebSettings settings = binding.web.getSettings();
+            settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+            settings.setAppCachePath(context.getCacheDir().getAbsolutePath());
+            settings.setAppCacheEnabled(true);
             return new DetailView() {
                 @Override
                 public View getContentView() {
