@@ -3,7 +3,6 @@ package com.kzaemrio.anread.adapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.kzaemrio.anread.R;
 import com.kzaemrio.anread.databinding.AdapterMainItemBinding;
@@ -12,7 +11,6 @@ import com.kzaemrio.anread.model.Item;
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.core.util.Consumer;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -43,8 +41,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.Holder> {
         holder.bind(item);
         holder.itemView.setOnClickListener(v -> {
             mItemConsumer.accept(item);
-            item.mIsRead = 1;
-            holder.bind(item);
         });
     }
 
@@ -67,19 +63,6 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.Holder> {
             mBind.label.setText(item.mChannelName);
             mBind.time.setText(item.mPubDateItem);
             mBind.content.setText(item.mDesItem);
-
-            boolean notRead = item.mIsRead == 0;
-
-            color(mBind.title, notRead, R.color.text_color_title);
-            color(mBind.label, notRead, R.color.colorAccent);
-            color(mBind.time, notRead, R.color.text_color_header);
-            color(mBind.content, notRead, R.color.text_color_content);
-        }
-
-        private void color(TextView title, boolean notRead, int colorId) {
-            int id = notRead ? colorId : R.color.text_color_header;
-            int color = ContextCompat.getColor(title.getContext(), id);
-            title.setTextColor(color);
         }
     }
 }

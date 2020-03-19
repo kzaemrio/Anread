@@ -77,7 +77,6 @@ public class MainActivity extends BaseActivity {
         item.setTitle(isSyncOnValue ? R.string.menu_to_sync_cancel : R.string.menu_to_sync);
         item.setIcon(isSyncOnValue ? R.drawable.ic_sync_24dp : R.drawable.ic_sync_disabled_24dp);
         item.setVisible(visible);
-        menu.findItem(R.id.read).setVisible(visible);
         menu.findItem(R.id.rss).setVisible(visible);
         return super.onCreateOptionsMenu(menu);
     }
@@ -85,9 +84,6 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.read:
-                mViewModel.readAll();
-                return true;
             case R.id.rss:
                 Router.toSubscriptionList(this);
                 return true;

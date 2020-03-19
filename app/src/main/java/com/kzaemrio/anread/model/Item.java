@@ -44,9 +44,6 @@ public class Item {
     @ColumnInfo
     public String mChannelUrl;
 
-    @ColumnInfo
-    public int mIsRead;
-
     public static Item create(FeedItem feedItem, String channelName, String url) {
         Item item = new Item();
         item.mLink = feedItem.mLink;
@@ -63,7 +60,6 @@ public class Item {
 
         item.mChannelName = channelName;
         item.mChannelUrl = url;
-        item.mIsRead = 0;
         return item;
     }
 

@@ -19,7 +19,6 @@ import com.kzaemrio.anread.R;
 import com.kzaemrio.anread.databinding.ActivityDetailBinding;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
-import com.kzaemrio.anread.model.ItemDao;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -58,11 +57,7 @@ public class DetailActivity extends BaseActivity {
         String link = getIntent().getStringExtra(EXTRA_LINK);
         if (!TextUtils.isEmpty(link)) {
             ArchTaskExecutor.getInstance().executeOnDiskIO(() -> {
-                ItemDao dao = AppDatabaseHolder.of(this).itemDao();
-                Item item = dao.query(link);
-                item.mIsRead = 1;
-                dao.insertReplace(item);
-                mItem.postValue(item);
+                mItem.postValue(AppDatabaseHolder.of(this).itemDao().query(link));
             });
         }
     }

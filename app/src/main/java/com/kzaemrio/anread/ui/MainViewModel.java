@@ -109,17 +109,4 @@ public class MainViewModel extends AndroidViewModel {
             mIsShowLoading.postValue(false);
         });
     }
-
-    public void readAll() {
-        if (mItemList != null && mItemList.getValue() != null) {
-            List<Item> list = mItemList.getValue();
-            for (Item item : list) {
-                item.mIsRead = 1;
-            }
-            mItemList.setValue(list);
-            ArchTaskExecutor.getInstance().executeOnDiskIO(() -> {
-                AppDatabaseHolder.of(getApplication()).itemDao().insertReplace(list.toArray(new Item[0]));
-            });
-        }
-    }
 }
