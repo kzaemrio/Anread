@@ -7,11 +7,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.kzaemrio.anread.R;
-import com.kzaemrio.anread.model.Item;
+import com.kzaemrio.anread.model.Channel;
+
+import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 public class MainActivity extends BaseActivity {
 
@@ -21,44 +23,29 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         MainView view = MainView.create(this);
-
-        view.setCallback(new MainView.Callback() {
-            @Override
-            public void onAddSubscriptionClick() {
-                Router.toAddSubscription(MainActivity.this);
-            }
-
-            @Override
-            public void onRefresh() {
-                mViewModel.init();
-            }
-
-            @Override
-            public void onItemClick(Item item) {
-                Router.toDetail(MainActivity.this, item.mLink);
-            }
-
-        });
         setContentView(view.getContentView());
 
-        mViewModel.isShowLoading().observe(this, view::showLoading);
-        mViewModel.isShowAddSubscription().observe(this, is -> {
-            invalidateOptionsMenu();
-            view.showAddSubscription(is);
-        });
-        mViewModel.getItemList().observe(this, view::bind);
         mViewModel.getIsSyncOn().observe(this, is -> {
             invalidateOptionsMenu();
 
-            if (mViewModel.getItemList().getValue() != null) {
+            if (mViewModel.getChannelList().getValue() != null) {
                 view.showSyncToast(is);
             }
         });
 
-        mViewModel.init();
+        mViewModel.getChannelList().observe(this, list -> {
+            if (list.isEmpty()) {
+                view.showAddSubscription();
+            } else {
+                invalidateOptionsMenu();
+                view.bind(list);
+            }
+        });
+
+        mViewModel.updateChannelList();
     }
 
     @Override
@@ -69,15 +56,20 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        Boolean isShow = mViewModel.isShowAddSubscription().getValue();
-        boolean visible = isShow != null && !isShow;
-        MenuItem item = menu.findItem(R.id.sync);
+
+        MenuItem itemSync = menu.findItem(R.id.sync);
+        MenuItem itemRss = menu.findItem(R.id.rss);
+
         Boolean isSyncOn = mViewModel.getIsSyncOn().getValue();
         boolean isSyncOnValue = isSyncOn != null && isSyncOn;
-        item.setTitle(isSyncOnValue ? R.string.menu_to_sync_cancel : R.string.menu_to_sync);
-        item.setIcon(isSyncOnValue ? R.drawable.ic_sync_24dp : R.drawable.ic_sync_disabled_24dp);
-        item.setVisible(visible);
-        menu.findItem(R.id.rss).setVisible(visible);
+        itemSync.setTitle(isSyncOnValue ? R.string.menu_to_sync_cancel : R.string.menu_to_sync);
+        itemSync.setIcon(isSyncOnValue ? R.drawable.ic_sync_24dp : R.drawable.ic_sync_disabled_24dp);
+
+        List<Channel> channelList = mViewModel.getChannelList().getValue();
+        boolean hasChannelList = channelList != null && channelList.size() > 0;
+
+        itemSync.setVisible(!hasChannelList);
+        itemRss.setVisible(!hasChannelList);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -98,31 +90,13 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case Router.REQUEST_CODE_ADD_SUBSCRIPTION:
-                case Router.REQUEST_CODE_SUBSCRIPTION_LIST:
-                    mViewModel.init();
-                    break;
-            }
+        if (resultCode == RESULT_OK && requestCode == Router.REQUEST_CODE_SUBSCRIPTION_LIST) {
+            mViewModel.updateChannelList();
         }
     }
 
     private interface Router {
-
-        int REQUEST_CODE_ADD_SUBSCRIPTION = 1;
         int REQUEST_CODE_SUBSCRIPTION_LIST = 2;
-
-        static void toAddSubscription(Activity activity) {
-            activity.startActivityForResult(
-                    AddChannelActivity.createIntent(activity),
-                    REQUEST_CODE_ADD_SUBSCRIPTION
-            );
-        }
-
-        static void toDetail(Activity activity, String link) {
-            activity.startActivity(DetailActivity.createIntent(activity, link));
-        }
 
         static void toSubscriptionList(Activity activity) {
             activity.startActivityForResult(

@@ -4,13 +4,10 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.CacheCleanWorker;
 import com.kzaemrio.anread.CacheFeedWorker;
-import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Channel;
-import com.kzaemrio.anread.model.Item;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,9 +24,7 @@ public class MainViewModel extends AndroidViewModel {
     private static final String PREF_KEY = "isSyncOn";
 
     private MutableLiveData<Boolean> mIsSyncOn;
-    private MutableLiveData<Boolean> mIsShowLoading;
-    private MutableLiveData<Boolean> mIsShowAddSubscription;
-    private MutableLiveData<List<Item>> mItemList;
+    private MutableLiveData<List<Channel>> mChannelList;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
@@ -62,51 +57,17 @@ public class MainViewModel extends AndroidViewModel {
         );
     }
 
-    public LiveData<Boolean> isShowLoading() {
-        if (mIsShowLoading == null) {
-            mIsShowLoading = new MutableLiveData<>();
+
+    public LiveData<List<Channel>> getChannelList() {
+        if (mChannelList == null) {
+            mChannelList = new MutableLiveData<>();
         }
-        return mIsShowLoading;
+        return mChannelList;
     }
 
-    public LiveData<Boolean> isShowAddSubscription() {
-        if (mIsShowAddSubscription == null) {
-            mIsShowAddSubscription = new MutableLiveData<>();
-        }
-        return mIsShowAddSubscription;
-    }
-
-
-    public LiveData<List<Item>> getItemList() {
-        if (mItemList == null) {
-            mItemList = new MutableLiveData<>();
-        }
-        return mItemList;
-    }
-
-    public void init() {
-        mIsShowLoading.setValue(true);
+    public void updateChannelList() {
         ArchTaskExecutor.getInstance().executeOnDiskIO(() -> {
-            AppDatabase database = AppDatabaseHolder.of(getApplication());
-            List<Channel> list = database.channelDao().getAll();
-
-            if (list.isEmpty()) {
-                mIsShowAddSubscription.postValue(true);
-            } else {
-                try {
-                    for (Channel channel : list) {
-                        String url = channel.getUrl();
-                        Actions.RssResult result = Actions.getRssResult(url);
-                        Actions.insertRssResult(database, result);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-                mIsShowAddSubscription.postValue(false);
-                mItemList.postValue(database.itemDao().getAll());
-            }
-            mIsShowLoading.postValue(false);
+            mChannelList.postValue(AppDatabaseHolder.of(getApplication()).channelDao().getAll());
         });
     }
 }

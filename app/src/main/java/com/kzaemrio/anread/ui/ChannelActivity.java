@@ -16,7 +16,7 @@ import com.kzaemrio.anread.model.Item;
 import java.util.List;
 
 import androidx.annotation.Nullable;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 
 public class ChannelActivity extends BaseActivity {
 
@@ -41,7 +41,7 @@ public class ChannelActivity extends BaseActivity {
         ChannelView channelView = ChannelView.create(this);
         setContentView(channelView.getContentView());
 
-        mViewModel = ViewModelProviders.of(this).get(ChannelViewModel.class);
+        mViewModel = new ViewModelProvider(this).get(ChannelViewModel.class);
         mViewModel.getList().observe(this, items -> {
             channelView.bind(items);
             setResult(RESULT_OK);
@@ -90,7 +90,8 @@ public class ChannelActivity extends BaseActivity {
 
                 @Override
                 public void bind(List<Item> items) {
-                    binding.list.setAdapter(new MainAdapter(items, mCallback::onItemClick));
+                    // TODO: use ItemListFragment
+//                    binding.list.setAdapter(new MainAdapter(items, mCallback::onItemClick));
                 }
 
                 @Override

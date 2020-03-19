@@ -8,19 +8,34 @@ import com.kzaemrio.anread.R;
 import com.kzaemrio.anread.databinding.AdapterMainItemBinding;
 import com.kzaemrio.anread.model.Item;
 
-import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.core.util.Consumer;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class MainAdapter extends RecyclerView.Adapter<MainAdapter.Holder> {
+public class MainAdapter extends ListAdapter<Item, MainAdapter.Holder> {
 
-    private final List<Item> mList;
-    private final Consumer<Item> mItemConsumer;
+    private Consumer<Item> mItemConsumer = item -> {
+    };
 
-    public MainAdapter(List<Item> list, Consumer<Item> itemConsumer) {
-        mList = list;
+    public MainAdapter() {
+        super(new DiffUtil.ItemCallback<Item>() {
+            @Override
+            public boolean areItemsTheSame(@NonNull Item oldItem, @NonNull Item newItem) {
+                return Objects.equals(oldItem.mLink, newItem.mLink);
+            }
+
+            @Override
+            public boolean areContentsTheSame(@NonNull Item oldItem, @NonNull Item newItem) {
+                return true;
+            }
+        });
+    }
+
+    public void setItemConsumer(Consumer<Item> itemConsumer) {
         mItemConsumer = itemConsumer;
     }
 
@@ -37,16 +52,11 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.Holder> {
 
     @Override
     public void onBindViewHolder(@NonNull Holder holder, int position) {
-        Item item = mList.get(position);
+        Item item = getItem(position);
         holder.bind(item);
         holder.itemView.setOnClickListener(v -> {
             mItemConsumer.accept(item);
         });
-    }
-
-    @Override
-    public int getItemCount() {
-        return mList.size();
     }
 
     static class Holder extends RecyclerView.ViewHolder {
