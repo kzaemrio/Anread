@@ -10,6 +10,9 @@ import androidx.room.Query;
 
 @Dao
 public interface ItemDao {
+    @Query("SELECT * FROM Item Order by mPubDate DESC Limit 1")
+    Item getFirst();
+
     @Query("SELECT * FROM Item Order by mPubDate DESC")
     List<Item> getAll();
 

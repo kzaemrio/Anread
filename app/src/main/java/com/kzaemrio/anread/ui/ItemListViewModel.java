@@ -6,6 +6,7 @@ import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
+import com.kzaemrio.anread.model.ItemDao;
 import com.kzaemrio.anread.model.ItemPosition;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class ItemListViewModel extends AndroidViewModel {
     private List<String> mChannelList;
 
     private MutableLiveData<Boolean> mIsShowLoading;
+    private MutableLiveData<Boolean> mHasNew;
     private MutableLiveData<List<Item>> mItemList;
     private MutableLiveData<AdapterItemPosition> mItemPosition;
 
@@ -37,6 +39,13 @@ public class ItemListViewModel extends AndroidViewModel {
             mIsShowLoading = new MutableLiveData<>();
         }
         return mIsShowLoading;
+    }
+
+    public LiveData<Boolean> getHasNew() {
+        if (mHasNew == null) {
+            mHasNew = new MutableLiveData<>();
+        }
+        return mHasNew;
     }
 
     public LiveData<List<Item>> getItemList() {
@@ -64,12 +73,16 @@ public class ItemListViewModel extends AndroidViewModel {
         try {
             mIsShowLoading.postValue(true);
             AppDatabase db = AppDatabaseHolder.of(getApplication());
+            ItemDao itemDao = db.itemDao();
+            Item firstOld = itemDao.getFirst();
 
             for (String channel : mChannelList) {
                 Actions.RssResult result = Actions.getRssResult(channel);
                 Actions.insertRssResult(db, result);
             }
-            mItemList.postValue(db.itemDao().getAll());
+            mItemList.postValue(itemDao.getAll());
+            Item firstNew = itemDao.getFirst();
+            mHasNew.postValue(!Objects.equals(firstOld.mLink, firstNew.mLink));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
