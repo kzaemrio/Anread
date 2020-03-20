@@ -23,5 +23,5 @@
     <string name="menu_to_sync_cancel">关闭自动同步</string>
     <string name="toast_sync_on">每半小时自动同步</string>
     <string name="toast_sync_cancel">自动同步关闭</string>
-    <string name="alert_has_new">^ 有 %d 更新 ^</string>
+    <string name="alert_has_new">有 %d 更新</string>
 </resources>
