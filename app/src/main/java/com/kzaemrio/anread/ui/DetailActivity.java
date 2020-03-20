@@ -23,7 +23,7 @@ import com.kzaemrio.anread.model.Item;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.arch.core.executor.ArchTaskExecutor;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.MutableLiveData;
 
 public class DetailActivity extends BaseActivity {
@@ -49,7 +49,7 @@ public class DetailActivity extends BaseActivity {
             String html = "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" +
                     "<h3>" + item.mTitle + "</h3>" +
                     "<p/>" +
-                    "<p>" + item.mChannelName + "\t" + item.mPubDateDetail + "</p>" +
+                    String.format("<p style=\"color:#%06X\">", 0xFFFFFF & ContextCompat.getColor(this, R.color.colorAccent)) + item.mChannelName + "\t" + item.mPubDateDetail + "</p>" +
                     "<p/>" +
                     item.mDesDetail;
             detailView.bind(html);
