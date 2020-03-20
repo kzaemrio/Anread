@@ -71,16 +71,18 @@ public interface ItemListView {
             }
 
             @Override
-            public void alertHasNew(boolean hasNew) {
-                if (hasNew) {
-                    Snackbar snackbar = Snackbar.make(binding.getRoot(), R.string.alert_has_new, Snackbar.LENGTH_SHORT);
-                    View view = snackbar.getView();
-                    FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) view.getLayoutParams();
-                    layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-                    layoutParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
-                    view.setLayoutParams(layoutParams);
-                    snackbar.show();
-                }
+            public void alertHasNew(int count) {
+                Snackbar snackbar = Snackbar.make(
+                        binding.getRoot(),
+                        context.getString(R.string.alert_has_new, count),
+                        Snackbar.LENGTH_SHORT
+                );
+                View view = snackbar.getView();
+                FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) view.getLayoutParams();
+                layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                layoutParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
+                view.setLayoutParams(layoutParams);
+                snackbar.show();
             }
         };
     }
@@ -99,7 +101,7 @@ public interface ItemListView {
 
     int getOffset();
 
-    void alertHasNew(boolean hasNew);
+    void alertHasNew(int count);
 
     interface Callback {
         void onRefresh();

@@ -22,7 +22,7 @@ public class ItemListViewModel extends AndroidViewModel {
     private List<String> mChannelList;
 
     private MutableLiveData<Boolean> mIsShowLoading;
-    private MutableLiveData<Boolean> mHasNew;
+    private MutableLiveData<Integer> mHasNew;
     private MutableLiveData<List<Item>> mItemList;
     private MutableLiveData<AdapterItemPosition> mItemPosition;
 
@@ -41,7 +41,7 @@ public class ItemListViewModel extends AndroidViewModel {
         return mIsShowLoading;
     }
 
-    public LiveData<Boolean> getHasNew() {
+    public LiveData<Integer> getHasNew() {
         if (mHasNew == null) {
             mHasNew = new MutableLiveData<>();
         }
@@ -74,15 +74,17 @@ public class ItemListViewModel extends AndroidViewModel {
             mIsShowLoading.postValue(true);
             AppDatabase db = AppDatabaseHolder.of(getApplication());
             ItemDao itemDao = db.itemDao();
-            Item firstOld = itemDao.getFirst();
+            long time = itemDao.getFirstPubDate();
 
             for (String channel : mChannelList) {
                 Actions.RssResult result = Actions.getRssResult(channel);
                 Actions.insertRssResult(db, result);
             }
             mItemList.postValue(itemDao.getAll());
-            Item firstNew = itemDao.getFirst();
-            mHasNew.postValue(!Objects.equals(firstOld.mLink, firstNew.mLink));
+            int count = itemDao.countNew(time);
+            if (count > 0) {
+                mHasNew.postValue(count);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
