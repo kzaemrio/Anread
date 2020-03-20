@@ -1,7 +1,6 @@
 package com.kzaemrio.anread.ui;
 
 import android.app.Application;
-import android.util.Log;
 
 import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.model.AppDatabase;
@@ -10,9 +9,9 @@ import com.kzaemrio.anread.model.Item;
 import com.kzaemrio.anread.model.ItemPosition;
 
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
-import androidx.arch.core.executor.ArchTaskExecutor;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -27,6 +26,10 @@ public class ItemListViewModel extends AndroidViewModel {
 
     public ItemListViewModel(@NonNull Application application) {
         super(application);
+    }
+
+    public void setChannelList(List<String> channelList) {
+        mChannelList = channelList;
     }
 
     public LiveData<Boolean> getIsShowLoading() {
@@ -50,58 +53,61 @@ public class ItemListViewModel extends AndroidViewModel {
         return mItemPosition;
     }
 
-    public void setChannelList(List<String> channelList) {
-        mChannelList = channelList;
+    public void updateItemList() {
+        Actions.executeOnDiskIO(() -> {
+            loadCache();
+            loadOnline();
+        });
     }
 
-    public void updateItemList() {
-        mIsShowLoading.setValue(true);
-        ArchTaskExecutor.getInstance().executeOnDiskIO(() -> {
+    private void loadOnline() {
+        try {
+            mIsShowLoading.postValue(true);
             AppDatabase db = AppDatabaseHolder.of(getApplication());
-            List<Item> list = db.itemDao().getAll();
-            if (list != null && list.size() > 0) {
-                mItemList.postValue(list);
 
-                ItemPosition itemPosition = db.itemPositionDao().query(mChannelList.toString());
-                if (itemPosition != null) {
-                    for (int i = 0; i < list.size(); i++) {
-                        Item item = list.get(i);
+            for (String channel : mChannelList) {
+                Actions.RssResult result = Actions.getRssResult(channel);
+                Actions.insertRssResult(db, result);
+            }
+            mItemList.postValue(db.itemDao().getAll());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            mIsShowLoading.postValue(false);
+        }
+    }
 
-                        if (item.mLink.equals(itemPosition.mLink)) {
-                            mItemPosition.postValue(AdapterItemPosition.create(
-                                    i,
-                                    itemPosition.mOffset
-                            ));
-                            break;
-                        }
+    private void loadCache() {
+        AppDatabase db = AppDatabaseHolder.of(getApplication());
+        List<Item> list = db.itemDao().getAll();
+        if (list != null && list.size() > 0) {
+            mItemList.postValue(list);
+
+            ItemPosition itemPosition = db.itemPositionDao().query(mChannelList.toString());
+            if (itemPosition != null) {
+                for (int i = 0; i < list.size(); i++) {
+                    Item item = list.get(i);
+
+                    if (item.mLink.equals(itemPosition.mLink)) {
+                        mItemPosition.postValue(AdapterItemPosition.create(
+                                i,
+                                itemPosition.mOffset
+                        ));
+                        break;
                     }
                 }
             }
-
-            try {
-                for (String channel : mChannelList) {
-                    Actions.RssResult result = Actions.getRssResult(channel);
-                    Actions.insertRssResult(db, result);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            mItemList.postValue(db.itemDao().getAll());
-            mIsShowLoading.postValue(false);
-        });
+        }
     }
 
     public void saveItemPosition(int adapterPosition, int offset) {
         String id = mChannelList.toString();
-        String link = mItemList.getValue().get(adapterPosition).mLink;
+        String link = Objects.requireNonNull(mItemList.getValue()).get(adapterPosition).mLink;
 
-        ArchTaskExecutor.getInstance().executeOnDiskIO(() -> {
-            AppDatabaseHolder.of(getApplication()).itemPositionDao().insertReplace(ItemPosition.create(
-                    id,
-                    link,
-                    offset
-            ));
+        Actions.executeOnDiskIO(() -> {
+            AppDatabaseHolder.of(getApplication())
+                    .itemPositionDao()
+                    .insert(ItemPosition.create(id, link, offset));
         });
     }
 

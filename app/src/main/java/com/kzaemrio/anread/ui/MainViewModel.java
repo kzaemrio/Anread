@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.CacheCleanWorker;
 import com.kzaemrio.anread.CacheFeedWorker;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
@@ -13,14 +14,12 @@ import java.util.List;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
-import androidx.arch.core.executor.ArchTaskExecutor;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 public class MainViewModel extends AndroidViewModel {
 
-    private static final String TAG = "MainViewModel";
     private static final String PREF_KEY = "isSyncOn";
 
     private MutableLiveData<Boolean> mIsSyncOn;
@@ -66,7 +65,7 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void updateChannelList() {
-        ArchTaskExecutor.getInstance().executeOnDiskIO(() -> {
+        Actions.executeOnDiskIO(() -> {
             mChannelList.postValue(AppDatabaseHolder.of(getApplication()).channelDao().getAll());
         });
     }

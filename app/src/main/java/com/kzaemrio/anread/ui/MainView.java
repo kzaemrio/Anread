@@ -1,6 +1,5 @@
 package com.kzaemrio.anread.ui;
 
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 
@@ -9,7 +8,7 @@ import com.kzaemrio.anread.R;
 import com.kzaemrio.anread.databinding.ActivityMainBinding;
 import com.kzaemrio.anread.model.Channel;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import androidx.fragment.app.FragmentActivity;
@@ -27,24 +26,17 @@ public interface MainView {
 
             @Override
             public void showAddSubscription() {
-                activity.getSupportFragmentManager().beginTransaction().replace(
-                        binding.frame.getId(),
-                        new AddSubscriptionFragment(),
-                        AddSubscriptionFragment.TAG
-                ).commit();
+                AddSubscriptionFragment.attach(activity, binding.frame.getId());
             }
 
             @Override
             public void bind(List<Channel> items) {
-                ArrayList<String> channels = new ArrayList<>(items.size());
-                for (Channel channel : items) {
-                    channels.add(channel.getUrl());
+                LinkedList<String> strings = new LinkedList<>();
+                for (Channel item : items) {
+                    strings.add(item.getUrl());
                 }
-                activity.getSupportFragmentManager().beginTransaction().replace(
-                        binding.frame.getId(),
-                        ItemListFragment.create(channels),
-                        ItemListFragment.TAG
-                ).commit();
+
+                ItemListFragment.attach(activity, binding.frame.getId(), strings);
             }
 
             @Override

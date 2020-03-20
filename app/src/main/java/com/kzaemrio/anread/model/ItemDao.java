@@ -10,23 +10,20 @@ import androidx.room.Query;
 
 @Dao
 public interface ItemDao {
-    @Query("SELECT * FROM item Order by mPubDate DESC")
+    @Query("SELECT * FROM Item Order by mPubDate DESC")
     List<Item> getAll();
 
-    @Query("SELECT * FROM item Where mLink = (:link)")
+    @Query("SELECT * FROM Item Where mLink = (:link)")
     Item query(String link);
 
-    @Query("SELECT * FROM item Where mChannelUrl = (:channelUrl) Order by mPubDate DESC")
+    @Query("SELECT * FROM Item Where mChannelUrl = (:channelUrl) Order by mPubDate DESC")
     List<Item> queryBy(String channelUrl);
 
-    @Query("SELECT * FROM item Where mPubDate < (:time)")
+    @Query("SELECT * FROM Item Where mPubDate < (:time)")
     Item[] queryBy(long time);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertReplace(Item... subscriptions);
-
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertIgnore(Item... subscriptions);
+    void insert(Item... subscriptions);
 
     @Delete
     void delete(Item... items);

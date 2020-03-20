@@ -1,6 +1,5 @@
 package com.kzaemrio.anread.ui;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,11 +8,13 @@ import android.view.ViewGroup;
 import com.kzaemrio.anread.model.Item;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 public class ItemListFragment extends Fragment {
@@ -22,16 +23,20 @@ public class ItemListFragment extends Fragment {
 
     private static final String KEY_CHANNEL_LIST = "KEY_CHANNEL_LIST";
 
-    public static ItemListFragment create(ArrayList<String> channels) {
-        ItemListFragment fragment = new ItemListFragment();
-        Bundle args = new Bundle();
-        args.putStringArrayList(KEY_CHANNEL_LIST, channels);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     private ItemListView mView;
     private ItemListViewModel mModel;
+
+    public static void attach(FragmentActivity activity, int frameId, List<String> channelUrls) {
+        Fragment fragment = new ItemListFragment();
+        Bundle args = new Bundle();
+        args.putStringArrayList(KEY_CHANNEL_LIST, new ArrayList<>(channelUrls));
+        fragment.setArguments(args);
+
+        activity.getSupportFragmentManager()
+                .beginTransaction()
+                .replace(frameId, fragment, TAG)
+                .commit();
+    }
 
     @Nullable
     @Override
@@ -48,6 +53,7 @@ public class ItemListFragment extends Fragment {
         mView.setCallback(new ItemListView.Callback() {
             @Override
             public void onRefresh() {
+                mModel.saveItemPosition(mView.getAdapterPosition(), mView.getOffset());
                 mModel.updateItemList();
             }
 
@@ -67,7 +73,9 @@ public class ItemListFragment extends Fragment {
     @Override
     public void onPause() {
         super.onPause();
-        mModel.saveItemPosition(mView.getAdapterPosition(), mView.getOffset());
+        if (!isRemoving()) {
+            mModel.saveItemPosition(mView.getAdapterPosition(), mView.getOffset());
+        }
     }
 
     private interface Router {

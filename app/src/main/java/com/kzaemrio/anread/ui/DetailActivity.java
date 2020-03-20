@@ -15,6 +15,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.R;
 import com.kzaemrio.anread.databinding.ActivityDetailBinding;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
@@ -56,7 +57,7 @@ public class DetailActivity extends BaseActivity {
 
         String link = getIntent().getStringExtra(EXTRA_LINK);
         if (!TextUtils.isEmpty(link)) {
-            ArchTaskExecutor.getInstance().executeOnDiskIO(() -> {
+            Actions.executeOnDiskIO(() -> {
                 mItem.postValue(AppDatabaseHolder.of(this).itemDao().query(link));
             });
         }

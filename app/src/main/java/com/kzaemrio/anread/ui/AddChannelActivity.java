@@ -29,14 +29,14 @@ public class AddChannelActivity extends BaseActivity {
         view.setCallback(() -> {
             view.showLoading(true);
             String input = view.getInput().toString();
-            ArchTaskExecutor.getInstance().executeOnDiskIO(() -> {
+            Actions.executeOnDiskIO(() -> {
                 try {
                     Actions.RssResult result = Actions.getRssResult(input);
                     Actions.insertRssResult(
                             AppDatabaseHolder.of(getApplication()),
                             result
                     );
-                    ArchTaskExecutor.getInstance().postToMainThread(() -> {
+                    Actions.executeOnMainThread(() -> {
                         view.showLoading(false);
                         setResult(RESULT_OK, new Intent().putExtra(
                                 "url",

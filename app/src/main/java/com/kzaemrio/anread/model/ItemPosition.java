@@ -7,7 +7,6 @@ import androidx.room.PrimaryKey;
 
 @Entity
 public class ItemPosition {
-
     @NonNull
     @PrimaryKey
     public String mId;

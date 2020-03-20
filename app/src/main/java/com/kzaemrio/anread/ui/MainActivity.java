@@ -68,8 +68,8 @@ public class MainActivity extends BaseActivity {
         List<Channel> channelList = mViewModel.getChannelList().getValue();
         boolean hasChannelList = channelList != null && channelList.size() > 0;
 
-        itemSync.setVisible(!hasChannelList);
-        itemRss.setVisible(!hasChannelList);
+        itemSync.setVisible(hasChannelList);
+        itemRss.setVisible(hasChannelList);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -96,7 +96,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private interface Router {
-        int REQUEST_CODE_SUBSCRIPTION_LIST = 2;
+        int REQUEST_CODE_SUBSCRIPTION_LIST = 1;
 
         static void toSubscriptionList(Activity activity) {
             activity.startActivityForResult(

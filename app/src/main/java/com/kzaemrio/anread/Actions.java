@@ -12,11 +12,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
+import androidx.arch.core.executor.ArchTaskExecutor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public interface Actions {
+    static void executeOnDiskIO(Runnable runnable) {
+        ArchTaskExecutor.getInstance().executeOnDiskIO(runnable);
+    }
+
+    static void executeOnMainThread(Runnable runnable) {
+        ArchTaskExecutor.getInstance().executeOnMainThread(runnable);
+    }
 
     static RssResult getRssResult(String url) throws Exception {
         Request request = new Request.Builder().url(url).build();
@@ -33,7 +41,7 @@ public interface Actions {
 
     static void insertRssResult(AppDatabase database, RssResult rssResult) {
         database.channelDao().insert(rssResult.getChannel());
-        database.itemDao().insertIgnore(rssResult.getItemArray());
+        database.itemDao().insert(rssResult.getItemArray());
     }
 
     interface RssResult {

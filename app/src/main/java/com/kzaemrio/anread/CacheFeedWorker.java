@@ -70,7 +70,7 @@ public class CacheFeedWorker extends Worker {
                 Collections.addAll(itemList, itemArray);
             }
             Item[] items = itemList.toArray(new Item[0]);
-            database.itemDao().insertIgnore(items);
+            database.itemDao().insert(items);
             return Result.success();
         } catch (Exception e) {
             e.printStackTrace();

@@ -7,17 +7,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.databinding.AdapterAddChannelBinding;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.arch.core.executor.ArchTaskExecutor;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 
 public class AddSubscriptionFragment extends Fragment {
 
-    public static final String TAG = "AddSubscriptionFragment";
+    private static final String TAG = "AddSubscriptionFragment";
+
+    public static void attach(FragmentActivity activity, int frameId) {
+        activity.getSupportFragmentManager().beginTransaction().replace(
+                frameId,
+                new AddSubscriptionFragment(),
+                TAG
+        ).commit();
+    }
 
     @Nullable
     @Override
@@ -32,7 +42,7 @@ public class AddSubscriptionFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == Router.REQUEST_CODE_ADD_SUBSCRIPTION && resultCode == Activity.RESULT_OK) {
-            ArchTaskExecutor.getInstance().executeOnDiskIO(() -> {
+            Actions.executeOnDiskIO(() -> {
                 new ViewModelProvider(requireActivity()).get(MainViewModel.class).updateChannelList();
             });
         }
