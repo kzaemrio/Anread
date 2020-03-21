@@ -40,8 +40,8 @@ public class CacheFeedWorker extends Worker {
 
             PeriodicWorkRequest request = new PeriodicWorkRequest.Builder(
                     CacheFeedWorker.class,
-                    30,
-                    TimeUnit.MINUTES)
+                    1,
+                    TimeUnit.HOURS)
                     .setConstraints(constraints)
                     .addTag(CacheFeedWorker.TAG)
                     .build();
