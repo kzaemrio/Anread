@@ -58,8 +58,8 @@ public class ItemListFragment extends Fragment {
             }
 
             @Override
-            public void onClick(Item item) {
-                Router.toDetail(ItemListFragment.this, item.mLink);
+            public void onClick(String itemLink) {
+                Router.toDetail(ItemListFragment.this, itemLink);
             }
         });
 

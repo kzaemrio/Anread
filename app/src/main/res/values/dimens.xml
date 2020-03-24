@@ -5,4 +5,5 @@
     <dimen name="text_size_title">16sp</dimen>
     <dimen name="text_size_content">14sp</dimen>
     <dimen name="text_size_time">12sp</dimen>
+    <dimen name="line_size">1dp</dimen>
 </resources>

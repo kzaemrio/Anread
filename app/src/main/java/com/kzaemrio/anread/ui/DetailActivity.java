@@ -21,6 +21,11 @@ import com.kzaemrio.anread.databinding.ActivityDetailBinding;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
 
+import org.threeten.bp.Instant;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.ZonedDateTime;
+import org.threeten.bp.format.DateTimeFormatter;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
@@ -46,12 +51,13 @@ public class DetailActivity extends BaseActivity {
         mItem = new MutableLiveData<>();
         mItem.observe(this, item -> {
             invalidateOptionsMenu();
+            String pubDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(item.mPubDate), ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' HH:mm"));
             String html = "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" +
                     "<h3>" + item.mTitle + "</h3>" +
                     "<p/>" +
-                    String.format("<p style=\"color:#%06X\">", 0xFFFFFF & ContextCompat.getColor(this, R.color.colorAccent)) + item.mChannelName + "\t" + item.mPubDateDetail + "</p>" +
+                    String.format("<p style=\"color:#%06X\">", 0xFFFFFF & ContextCompat.getColor(this, R.color.colorAccent)) + item.mChannelName + "\t" + pubDate + "</p>" +
                     "<p/>" +
-                    item.mDesDetail;
+                    item.mDes;
             detailView.bind(html);
         });
 

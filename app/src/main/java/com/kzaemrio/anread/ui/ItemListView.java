@@ -7,16 +7,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
+import com.drakeet.multitype.MultiTypeAdapter;
 import com.google.android.material.snackbar.Snackbar;
 import com.kzaemrio.anread.R;
-import com.kzaemrio.anread.adapter.MainAdapter;
-import com.kzaemrio.anread.adapter.SimpleDividerItemDecoration;
+import com.kzaemrio.anread.adapter.ContentItem;
+import com.kzaemrio.anread.adapter.ContentItemBinder;
 import com.kzaemrio.anread.adapter.SimpleOffsetItemDecoration;
+import com.kzaemrio.anread.adapter.StrId;
+import com.kzaemrio.anread.adapter.TimeHeaderItem;
+import com.kzaemrio.anread.adapter.TimeHeaderItemBinder;
+import com.kzaemrio.anread.adapter.TimeItem;
+import com.kzaemrio.anread.adapter.TimeItemBinder;
 import com.kzaemrio.anread.databinding.FragmentItemListBinding;
 import com.kzaemrio.anread.model.Item;
 
 import java.util.List;
 
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 public interface ItemListView {
@@ -27,11 +34,14 @@ public interface ItemListView {
         layoutManager.setStackFromEnd(true);
 
         binding.list.setLayoutManager(layoutManager);
-        binding.list.addItemDecoration(new SimpleDividerItemDecoration(context));
-        binding.list.addItemDecoration(new SimpleOffsetItemDecoration());
 
-        MainAdapter adapter = new MainAdapter();
+        MultiTypeAdapter adapter = new MultiTypeAdapter();
+        adapter.register(TimeHeaderItem.class, new TimeHeaderItemBinder());
+        adapter.register(TimeItem.class, new TimeItemBinder());
+        adapter.register(ContentItem.class, new ContentItemBinder());
         binding.list.setAdapter(adapter);
+
+        binding.list.addItemDecoration(new SimpleOffsetItemDecoration());
 
         return new ItemListView() {
             @Override
@@ -45,14 +55,36 @@ public interface ItemListView {
             }
 
             @Override
-            public void bind(List<Item> list) {
-                adapter.submitList(list);
+            public void bind(List<StrId> list) {
+                DiffUtil.DiffResult diffResult = DiffUtil.calculateDiff(new DiffUtil.Callback() {
+                    @Override
+                    public int getOldListSize() {
+                        return adapter.getItemCount();
+                    }
+
+                    @Override
+                    public int getNewListSize() {
+                        return list.size();
+                    }
+
+                    @Override
+                    public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
+                        return ((StrId) adapter.getItems().get(oldItemPosition)).strId().equals(list.get(newItemPosition).strId());
+                    }
+
+                    @Override
+                    public boolean areContentsTheSame(int oldItemPosition, int newItemPosition) {
+                        return true;
+                    }
+                });
+                adapter.setItems(list);
+                diffResult.dispatchUpdatesTo(adapter);
             }
 
             @Override
             public void setCallback(Callback callback) {
                 binding.swipe.setOnRefreshListener(callback::onRefresh);
-                adapter.setItemConsumer(callback::onClick);
+                adapter.register(ContentItem.class, new ContentItemBinder(callback::onClick));
             }
 
             @Override
@@ -91,7 +123,7 @@ public interface ItemListView {
 
     void showLoading(boolean isShow);
 
-    void bind(List<Item> list);
+    void bind(List<StrId> list);
 
     void setCallback(Callback callback);
 
@@ -106,6 +138,6 @@ public interface ItemListView {
     interface Callback {
         void onRefresh();
 
-        void onClick(Item item);
+        void onClick(String itemLink);
     }
 }
