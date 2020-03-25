@@ -9,18 +9,18 @@ import androidx.room.PrimaryKey;
 public class ItemPosition {
     @NonNull
     @PrimaryKey
-    public String mId;
+    public String mGroupId;
 
     @ColumnInfo
-    public String mLink;
+    public String mItemId;
 
     @ColumnInfo
     public int mOffset;
 
-    public static ItemPosition create(String id, String link, int offset) {
+    public static ItemPosition create(String groupId, String itemId, int offset) {
         ItemPosition itemPosition = new ItemPosition();
-        itemPosition.mId = id;
-        itemPosition.mLink = link;
+        itemPosition.mGroupId = groupId;
+        itemPosition.mItemId = itemId;
         itemPosition.mOffset = offset;
         return itemPosition;
     }

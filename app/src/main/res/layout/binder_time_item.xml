@@ -17,7 +17,6 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <View
-        android:id="@+id/box"
         android:layout_width="8dp"
         android:layout_height="8dp"
         android:background="@drawable/bg_shape_label"
@@ -48,5 +47,4 @@
         app:layout_constraintBottom_toBottomOf="@id/time"
         app:layout_constraintStart_toEndOf="@id/time"
         app:layout_constraintTop_toTopOf="@id/time" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>

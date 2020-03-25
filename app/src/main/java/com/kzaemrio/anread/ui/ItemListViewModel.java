@@ -119,7 +119,7 @@ public class ItemListViewModel extends AndroidViewModel {
                 for (int i = 0; i < result.size(); i++) {
                     StrId item = result.get(i);
 
-                    if (item.strId().equals(itemPosition.mLink)) {
+                    if (item.strId().equals(itemPosition.mItemId)) {
                         mItemPosition.postValue(AdapterItemPosition.create(
                                 i,
                                 itemPosition.mOffset
@@ -165,13 +165,13 @@ public class ItemListViewModel extends AndroidViewModel {
     }
 
     public void saveItemPosition(int adapterPosition, int offset) {
-        String id = mChannelList.toString();
-        String link = Objects.requireNonNull(mItemList.getValue()).get(adapterPosition).strId();
+        String groupId = mChannelList.toString();
+        String itemId = Objects.requireNonNull(mItemList.getValue()).get(adapterPosition).strId();
 
         Actions.executeOnDiskIO(() -> {
             AppDatabaseHolder.of(getApplication())
                     .itemPositionDao()
-                    .insert(ItemPosition.create(id, link, offset));
+                    .insert(ItemPosition.create(groupId, itemId, offset));
         });
     }
 

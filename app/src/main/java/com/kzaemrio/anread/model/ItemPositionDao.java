@@ -8,7 +8,7 @@ import androidx.room.Query;
 
 @Dao
 public interface ItemPositionDao {
-    @Query("SELECT * FROM ItemPosition Where mId = (:id)")
+    @Query("SELECT * FROM ItemPosition Where mGroupId = (:id)")
     ItemPosition query(String id);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

@@ -19,7 +19,6 @@ import com.kzaemrio.anread.adapter.TimeHeaderItemBinder;
 import com.kzaemrio.anread.adapter.TimeItem;
 import com.kzaemrio.anread.adapter.TimeItemBinder;
 import com.kzaemrio.anread.databinding.FragmentItemListBinding;
-import com.kzaemrio.anread.model.Item;
 
 import java.util.List;
 

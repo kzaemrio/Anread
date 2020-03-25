@@ -19,9 +19,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.AddChannelActivity" android:label="@string/label_add_subscription"/>
-        <activity android:name=".ui.DetailActivity" android:label="@string/label_feed_detail"/>
-        <activity android:name=".ui.ChannelListActivity" android:label="@string/label_subscription_list"/>
+        <activity
+            android:name=".ui.AddChannelActivity"
+            android:label="@string/label_add_subscription" />
+        <activity
+            android:name=".ui.DetailActivity"
+            android:label="@string/label_feed_detail" />
+        <activity
+            android:name=".ui.ChannelListActivity"
+            android:label="@string/label_subscription_list" />
         <activity android:name=".ui.ChannelActivity" />
     </application>
 </manifest>

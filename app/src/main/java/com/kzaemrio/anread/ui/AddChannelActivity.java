@@ -14,7 +14,6 @@ import com.kzaemrio.anread.databinding.ActivityAddChannelBinding;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 
 import androidx.annotation.Nullable;
-import androidx.arch.core.executor.ArchTaskExecutor;
 
 public class AddChannelActivity extends BaseActivity {
     public static Intent createIntent(Context context) {
