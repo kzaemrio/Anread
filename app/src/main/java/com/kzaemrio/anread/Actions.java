@@ -39,11 +39,6 @@ public interface Actions {
         return RssResult.create(channel, itemArray);
     }
 
-    static void insertRssResult(AppDatabase database, RssResult rssResult) {
-        database.channelDao().insert(rssResult.getChannel());
-        database.itemDao().insert(rssResult.getItemArray());
-    }
-
     interface RssResult {
         static RssResult create(Channel channel, Item[] itemList) {
             return new RssResult() {

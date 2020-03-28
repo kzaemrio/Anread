@@ -10,7 +10,6 @@ import com.kzaemrio.anread.adapter.TimeItem;
 import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
-import com.kzaemrio.anread.model.ItemDao;
 import com.kzaemrio.anread.model.ItemPosition;
 import com.kzaemrio.anread.xml.XMLLexer;
 
@@ -23,6 +22,7 @@ import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -79,25 +79,36 @@ public class ItemListViewModel extends AndroidViewModel {
 
     public void updateItemList() {
         Actions.executeOnDiskIO(() -> {
-            loadCache();
-            loadOnline();
+            List<Item> cacheItemList = loadCache();
+            loadOnLine(cacheItemList);
         });
     }
 
-    private void loadOnline() {
+    private void loadOnLine(List<Item> cacheItemList) {
         try {
             mIsShowLoading.postValue(true);
-            AppDatabase db = AppDatabaseHolder.of(getApplication());
-            ItemDao itemDao = db.itemDao();
-            long time = itemDao.getFirstPubDate();
+            AppDatabase database = AppDatabaseHolder.of(getApplication());
 
+            LinkedList<Item> allItemList = new LinkedList<>();
             for (String channel : mChannelList) {
-                Actions.RssResult result = Actions.getRssResult(channel);
-                Actions.insertRssResult(db, result);
+                Actions.RssResult rssResult = Actions.getRssResult(channel);
+                allItemList.addAll(Arrays.asList(rssResult.getItemArray()));
             }
-            mItemList.postValue(map(itemDao.getAll()));
-            int count = itemDao.countNew(time);
+
+            LinkedList<Item> allNewList = new LinkedList<>();
+            String link = cacheItemList.get(0).mLink;
+            for (Item item : allItemList) {
+                if (item.mLink.equals(link)) {
+                    break;
+                } else {
+                    allNewList.add(item);
+                }
+            }
+            int count = allNewList.size();
+            allNewList.addAll(cacheItemList);
+            mItemList.postValue(toStrIdList(allNewList));
             if (count > 0) {
+                database.itemDao().insert(allNewList.subList(0, count).toArray(new Item[0]));
                 mHasNew.postValue(count);
             }
         } catch (Exception e) {
@@ -107,46 +118,48 @@ public class ItemListViewModel extends AndroidViewModel {
         }
     }
 
-    private void loadCache() {
-        AppDatabase db = AppDatabaseHolder.of(getApplication());
-        List<Item> list = db.itemDao().getAll();
-        if (list != null && list.size() > 0) {
-            List<StrId> result = map(list);
-            mItemList.postValue(result);
+    private List<Item> loadCache() {
+        AppDatabase database = AppDatabaseHolder.of(getApplication());
+        List<Item> cacheItemList = mChannelList.size() == 1 ?
+                database.itemDao().queryBy(mChannelList.get(0)) :
+                database.itemDao().getAll();
+        List<StrId> cacheStrIdList = toStrIdList(cacheItemList);
+        mItemList.postValue(cacheStrIdList);
 
-            ItemPosition itemPosition = db.itemPositionDao().query(mChannelList.toString());
-            if (itemPosition != null) {
-                for (int i = 0; i < result.size(); i++) {
-                    StrId item = result.get(i);
+        ItemPosition itemPosition = database.itemPositionDao().query(mChannelList.toString());
+        if (itemPosition != null) {
+            for (int i = 0; i < cacheStrIdList.size(); i++) {
+                StrId item = cacheStrIdList.get(i);
 
-                    if (item.strId().equals(itemPosition.mItemId)) {
-                        mItemPosition.postValue(AdapterItemPosition.create(
-                                i,
-                                itemPosition.mOffset
-                        ));
-                        break;
-                    }
+                if (item.strId().equals(itemPosition.mItemId)) {
+                    mItemPosition.postValue(AdapterItemPosition.create(
+                            i,
+                            itemPosition.mOffset
+                    ));
+                    break;
                 }
             }
         }
+
+        return cacheItemList;
     }
 
-    private static List<StrId> map(List<Item> list) {
-        LinkedList<StrId> result = new LinkedList<>();
+    private static List<StrId> toStrIdList(List<Item> itemList) {
+        LinkedList<StrId> strIdLinkedList = new LinkedList<>();
         ZoneId zone = ZoneId.systemDefault();
         DateTimeFormatter timeHeaderFormat = DateTimeFormatter.ofPattern("MMM dd EEE");
         DateTimeFormatter timeItemFormat = DateTimeFormatter.ofPattern("HH:mm");
         ZonedDateTime last = null;
-        for (Item item : list) {
+        for (Item item : itemList) {
             ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(item.mPubDate), zone);
             if (last == null || last.getDayOfMonth() - zonedDateTime.getDayOfMonth() > 0) {
-                result.add(new TimeHeaderItem(zonedDateTime.format(timeHeaderFormat)));
+                strIdLinkedList.add(new TimeHeaderItem(zonedDateTime.format(timeHeaderFormat)));
             }
-            result.add(new TimeItem(zonedDateTime.format(timeItemFormat), item.mChannelName));
-            result.add(new ContentItem(item.mLink, item.mTitle, parseItemDes(item.mDes)));
+            strIdLinkedList.add(new TimeItem(zonedDateTime.format(timeItemFormat), item.mChannelName));
+            strIdLinkedList.add(new ContentItem(item.mLink, item.mTitle, parseItemDes(item.mDes)));
             last = zonedDateTime;
         }
-        return new ArrayList<>(result);
+        return new ArrayList<>(strIdLinkedList);
     }
 
     private static String parseItemDes(String des) {
