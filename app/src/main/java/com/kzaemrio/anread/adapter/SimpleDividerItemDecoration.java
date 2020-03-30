@@ -17,7 +17,7 @@ public class SimpleDividerItemDecoration extends RecyclerView.ItemDecoration {
     private final Paint mPaint;
 
     public SimpleDividerItemDecoration(Context context) {
-        mMargin = context.getResources().getDimensionPixelSize(R.dimen.space_small);
+        mMargin = context.getResources().getDimensionPixelSize(R.dimen.space_medium);
         mPaint = new Paint();
         mPaint.setColor(ContextCompat.getColor(context, R.color.text_color_header));
     }
