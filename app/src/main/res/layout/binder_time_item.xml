@@ -31,9 +31,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/space_medium"
         android:layout_marginTop="@dimen/space_medium"
-        android:layout_marginBottom="@dimen/space_medium"
         android:textColor="@color/colorAccent"
         android:textSize="@dimen/text_size_time"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@id/line"
         app:layout_constraintTop_toTopOf="parent" />
 

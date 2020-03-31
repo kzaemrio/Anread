@@ -45,7 +45,6 @@
         android:layout_marginStart="@dimen/space_medium"
         android:layout_marginTop="@dimen/space_small"
         android:layout_marginEnd="@dimen/space_medium"
-        android:layout_marginBottom="@dimen/space_medium"
         android:textColor="@color/text_color_content"
         android:textSize="@dimen/text_size_content"
         app:layout_constraintBottom_toBottomOf="parent"

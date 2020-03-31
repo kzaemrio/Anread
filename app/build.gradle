@@ -71,6 +71,4 @@ dependencies {
     }
 
     implementation 'org.antlr:antlr4-runtime:4.8'
-
-    implementation 'com.drakeet.multitype:multitype:4.2.0'
 }

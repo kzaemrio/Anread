@@ -2,6 +2,8 @@ package com.kzaemrio.anread.adapter;
 
 public class ContentItem implements StrId {
 
+    public static final int TYPE = 2;
+
     private final String mLink;
     private final String mTitle;
     private final String mDes;
@@ -27,5 +29,10 @@ public class ContentItem implements StrId {
     @Override
     public String strId() {
         return mLink;
+    }
+
+    @Override
+    public int type() {
+        return TYPE;
     }
 }
