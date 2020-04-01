@@ -45,70 +45,68 @@ public class SimpleOffsetItemDecoration extends RecyclerView.ItemDecoration {
     @Override
     public void onDrawOver(@NonNull Canvas c, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         super.onDrawOver(c, parent, state);
-        c.save();
-        c.clipRect(0, 0, mSpaceLarge, parent.getBottom());
 
-        mPaint.setStrokeWidth(0);
-        mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setColor(mLineColor);
-        float cx = mSpaceLarge / 2F;
-        float lineWidth = mDp1 / 2;
-        c.drawRect(
-                cx - lineWidth,
-                0,
-                cx + lineWidth,
-                parent.getHeight(),
-                mPaint
+        if (parent.getChildCount() > 0) {
+            mPaint.setStrokeWidth(0);
+            mPaint.setStyle(Paint.Style.FILL);
+            mPaint.setColor(mLineColor);
+            float cx = mSpaceLarge / 2F;
+            float lineWidth = mDp1 / 2;
+            c.drawRect(
+                    cx - lineWidth,
+                    0,
+                    cx + lineWidth,
+                    parent.getHeight(),
+                    mPaint
 
-        );
+            );
 
-        for (int i = 0, count = parent.getChildCount(); i < count; i++) {
-            View view = parent.getChildAt(i);
-            float cy = view.getTop() + view.getHeight() / 2F;
-            float boxSize = mDp1 * 4;
-            float boxLeft = cx - boxSize;
-            float boxTop = cy - boxSize;
-            float boxRight = cx + boxSize;
-            float boxBottom = cy + boxSize;
-            switch (parent.getChildViewHolder(view).getItemViewType()) {
-                case TimeHeaderItem.TYPE:
-                    mPaint.setStrokeWidth(0);
-                    mPaint.setStyle(Paint.Style.FILL);
-                    mPaint.setColor(mBoxColor);
-                    c.drawRect(
-                            boxLeft,
-                            boxTop,
-                            boxRight,
-                            boxBottom,
-                            mPaint
-                    );
-                    break;
-                case TimeItem.TYPE:
-                    mPaint.setStrokeWidth(mDp1);
-                    mPaint.setStyle(Paint.Style.STROKE);
-                    mPaint.setColor(mBoxColor);
-                    c.drawRect(
-                            boxLeft,
-                            boxTop,
-                            boxRight,
-                            boxBottom,
-                            mPaint
-                    );
-                    mPaint.setColor(Color.WHITE);
-                    mPaint.setStrokeWidth(0);
-                    mPaint.setStyle(Paint.Style.FILL);
-                    c.drawRect(
-                            boxLeft + mDp1,
-                            boxTop + mDp1,
-                            boxRight - mDp1,
-                            boxBottom - mDp1,
-                            mPaint
-                    );
-                    break;
+            for (int i = 0, count = parent.getChildCount(); i < count; i++) {
+                View view = parent.getChildAt(i);
+                float cy = view.getTop() + view.getHeight() / 2F;
+                float boxSize = mDp1 * 4;
+                float boxLeft = cx - boxSize;
+                float boxTop = cy - boxSize;
+                float boxRight = cx + boxSize;
+                float boxBottom = cy + boxSize;
+                switch (parent.getChildViewHolder(view).getItemViewType()) {
+                    case TimeHeaderItem.TYPE:
+                        mPaint.setStrokeWidth(0);
+                        mPaint.setStyle(Paint.Style.FILL);
+                        mPaint.setColor(mBoxColor);
+                        c.drawRect(
+                                boxLeft,
+                                boxTop,
+                                boxRight,
+                                boxBottom,
+                                mPaint
+                        );
+                        break;
+                    case TimeItem.TYPE:
+                        mPaint.setStrokeWidth(mDp1);
+                        mPaint.setStyle(Paint.Style.STROKE);
+                        mPaint.setColor(mBoxColor);
+                        c.drawRect(
+                                boxLeft,
+                                boxTop,
+                                boxRight,
+                                boxBottom,
+                                mPaint
+                        );
+                        mPaint.setColor(Color.WHITE);
+                        mPaint.setStrokeWidth(0);
+                        mPaint.setStyle(Paint.Style.FILL);
+                        c.drawRect(
+                                boxLeft + mDp1,
+                                boxTop + mDp1,
+                                boxRight - mDp1,
+                                boxBottom - mDp1,
+                                mPaint
+                        );
+                        break;
+                }
             }
         }
-
-        c.restore();
     }
 
     @Override
