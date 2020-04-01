@@ -174,7 +174,7 @@ public class ItemListAdapter extends ListAdapter<StrId, RecyclerView.ViewHolder>
             mContentColor = new ForegroundColorSpan(ContextCompat.getColor(context, R.color.text_color_content));
             mTitleSize = new AbsoluteSizeSpan(context.getResources().getDimensionPixelSize(R.dimen.text_size_title));
             mContentSize = new AbsoluteSizeSpan(context.getResources().getDimensionPixelSize(R.dimen.text_size_content));
-            mSpaceSize = new SpaceSpan(0, context.getResources().getDimensionPixelSize(R.dimen.space_small));
+            mSpaceSize = new SpaceSpan(0, context.getResources().getDimensionPixelSize(R.dimen.space_large));
         }
 
         public void bind(ContentItem item, Consumer<String> clickConsumer) {
