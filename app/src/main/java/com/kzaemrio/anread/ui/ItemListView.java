@@ -30,7 +30,7 @@ public interface ItemListView {
         ItemListAdapter adapter = new ItemListAdapter();
         binding.list.setAdapter(adapter);
 
-        binding.list.addItemDecoration(new SimpleOffsetItemDecoration());
+        binding.list.addItemDecoration(new SimpleOffsetItemDecoration(context));
 
         return new ItemListView() {
             @Override
