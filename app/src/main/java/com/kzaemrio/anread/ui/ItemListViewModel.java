@@ -91,8 +91,7 @@ public class ItemListViewModel extends AndroidViewModel {
 
             LinkedList<Item> allItemList = new LinkedList<>();
             for (String channel : mChannelList) {
-                Actions.RssResult rssResult = Actions.getRssResult(channel);
-                allItemList.addAll(Arrays.asList(rssResult.getItemArray()));
+                allItemList.addAll(Arrays.asList(Actions.getItemArray(channel)));
             }
 
             LinkedList<Item> allNewList = new LinkedList<>();

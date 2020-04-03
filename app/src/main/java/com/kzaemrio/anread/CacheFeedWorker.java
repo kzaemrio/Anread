@@ -65,9 +65,7 @@ public class CacheFeedWorker extends Worker {
             List<Channel> all = dao.getAll();
             List<Item> itemList = new LinkedList<>();
             for (Channel channel : all) {
-                Actions.RssResult result = Actions.getRssResult(channel.getUrl());
-                Item[] itemArray = result.getItemArray();
-                Collections.addAll(itemList, itemArray);
+                Collections.addAll(itemList, Actions.getItemArray(channel.getUrl()));
             }
             Item[] items = itemList.toArray(new Item[0]);
             database.itemDao().insert(items);
