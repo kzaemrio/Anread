@@ -1,13 +1,17 @@
 package com.kzaemrio.anread;
 
-import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.Channel;
 import com.kzaemrio.anread.model.Feed;
 import com.kzaemrio.anread.model.FeedItem;
 import com.kzaemrio.anread.model.Item;
+import com.kzaemrio.anread.xml.XMLLexer;
 
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.Token;
 import org.simpleframework.xml.core.Persister;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -37,6 +41,28 @@ public interface Actions {
         }
         Item[] itemArray = list.toArray(new Item[0]);
         return RssResult.create(channel, itemArray);
+    }
+
+    static Channel getChannel(String url) throws IOException {
+        Request request = new Request.Builder().url(url).build();
+        Response response = new OkHttpClient.Builder().build().newCall(request).execute();
+        InputStream inputStream = Objects.requireNonNull(response.body()).byteStream();
+        XMLLexer xmlLexer = new XMLLexer(CharStreams.fromStream(inputStream));
+
+        boolean[] is = {false};
+        for (Token token = xmlLexer.nextToken(); token.getType() != Token.EOF; token = xmlLexer.nextToken()) {
+            if (is[0]) {
+                if (token.getType() == XMLLexer.TEXT) {
+                    return Channel.create(url, token.getText());
+                }
+            } else {
+                if (token.getType() == XMLLexer.Name && token.getText().equals("title")) {
+                    is[0] = true;
+                }
+            }
+        }
+
+        throw new IllegalArgumentException("error rss url: " + url);
     }
 
     interface RssResult {

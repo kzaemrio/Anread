@@ -11,8 +11,8 @@ import android.view.View;
 
 import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.databinding.ActivityAddChannelBinding;
-import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
+import com.kzaemrio.anread.model.Channel;
 
 import androidx.annotation.Nullable;
 
@@ -31,15 +31,13 @@ public class AddChannelActivity extends BaseActivity {
             String input = view.getInput().toString();
             Actions.executeOnDiskIO(() -> {
                 try {
-                    Actions.RssResult result = Actions.getRssResult(input);
-                    AppDatabase database = AppDatabaseHolder.of(getApplication());
-                    database.channelDao().insert(result.getChannel());
-                    database.itemDao().insert(result.getItemArray());
+                    Channel channel = Actions.getChannel(input);
+                    AppDatabaseHolder.of(getApplication()).channelDao().insert(channel);
                     Actions.executeOnMainThread(() -> {
                         view.showLoading(false);
                         setResult(RESULT_OK, new Intent().putExtra(
                                 "url",
-                                result.getChannel().getUrl())
+                                channel.getUrl())
                         );
                         finish();
                     });
