@@ -7,7 +7,6 @@ import com.kzaemrio.anread.adapter.ContentItem;
 import com.kzaemrio.anread.adapter.StrId;
 import com.kzaemrio.anread.adapter.TimeHeaderItem;
 import com.kzaemrio.anread.adapter.TimeItem;
-import com.kzaemrio.anread.model.AppDatabase;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
 import com.kzaemrio.anread.model.ItemPosition;
@@ -23,9 +22,12 @@ import org.threeten.bp.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -78,57 +80,31 @@ public class ItemListViewModel extends AndroidViewModel {
     }
 
     public void updateItemList() {
-        Actions.executeOnDiskIO(() -> {
-            List<Item> cacheItemList = loadCache();
-            loadOnLine(cacheItemList);
-        });
+        Actions.executeOnDiskIO(this::loadOnLine);
     }
 
-    private void loadOnLine(List<Item> cacheItemList) {
-        try {
-            mIsShowLoading.postValue(true);
-            AppDatabase database = AppDatabaseHolder.of(getApplication());
+    private void loadOnLine() {
+        mIsShowLoading.postValue(true);
+        List<Item> list = mChannelList.stream()
+                .map(url -> {
+                    try {
+                        return Actions.getItemArray(url);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return new Item[0];
+                    }
+                })
+                .peek(array -> Arrays.sort(array, Comparator.<Item, Long>comparing(i -> i.mPubDate).reversed()))
+                .flatMap(Stream::of)
+                .sorted(Comparator.<Item, Long>comparing(i -> i.mPubDate).reversed())
+                .collect(Collectors.toList());
+        List<StrId> strIdList = toStrIdList(list);
+        mItemList.postValue(strIdList);
 
-            LinkedList<Item> allItemList = new LinkedList<>();
-            for (String channel : mChannelList) {
-                allItemList.addAll(Arrays.asList(Actions.getItemArray(channel)));
-            }
-
-            LinkedList<Item> allNewList = new LinkedList<>();
-            String link = cacheItemList.get(0).mLink;
-            for (Item item : allItemList) {
-                if (item.mLink.equals(link)) {
-                    break;
-                } else {
-                    allNewList.add(item);
-                }
-            }
-            int count = allNewList.size();
-            allNewList.addAll(cacheItemList);
-            mItemList.postValue(toStrIdList(allNewList));
-            if (count > 0) {
-                database.itemDao().insert(allNewList.subList(0, count).toArray(new Item[0]));
-                mHasNew.postValue(count);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            mIsShowLoading.postValue(false);
-        }
-    }
-
-    private List<Item> loadCache() {
-        AppDatabase database = AppDatabaseHolder.of(getApplication());
-        List<Item> cacheItemList = mChannelList.size() == 1 ?
-                database.itemDao().queryBy(mChannelList.get(0)) :
-                database.itemDao().getAll();
-        List<StrId> cacheStrIdList = toStrIdList(cacheItemList);
-        mItemList.postValue(cacheStrIdList);
-
-        ItemPosition itemPosition = database.itemPositionDao().query(mChannelList.toString());
+        ItemPosition itemPosition = AppDatabaseHolder.of(getApplication()).itemPositionDao().query(mChannelList.toString());
         if (itemPosition != null) {
-            for (int i = 0; i < cacheStrIdList.size(); i++) {
-                StrId item = cacheStrIdList.get(i);
+            for (int i = 0; i < strIdList.size(); i++) {
+                StrId item = strIdList.get(i);
 
                 if (item.strId().equals(itemPosition.mItemId)) {
                     mItemPosition.postValue(AdapterItemPosition.create(
@@ -139,8 +115,7 @@ public class ItemListViewModel extends AndroidViewModel {
                 }
             }
         }
-
-        return cacheItemList;
+        mIsShowLoading.postValue(false);
     }
 
     private static List<StrId> toStrIdList(List<Item> itemList) {
