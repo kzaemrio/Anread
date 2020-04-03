@@ -116,6 +116,8 @@ public class ItemListViewModel extends AndroidViewModel {
             }
         }
         mIsShowLoading.postValue(false);
+
+        AppDatabaseHolder.of(getApplication()).itemDao().insert(list.toArray(new Item[0]));
     }
 
     private static List<StrId> toStrIdList(List<Item> itemList) {
