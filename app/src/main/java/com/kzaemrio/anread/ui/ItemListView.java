@@ -10,8 +10,7 @@ import android.widget.FrameLayout;
 import com.google.android.material.snackbar.Snackbar;
 import com.kzaemrio.anread.R;
 import com.kzaemrio.anread.adapter.ItemListAdapter;
-import com.kzaemrio.anread.adapter.SimpleOffsetItemDecoration;
-import com.kzaemrio.anread.adapter.StrId;
+import com.kzaemrio.anread.adapter.SimpleDividerItemDecoration;
 import com.kzaemrio.anread.databinding.FragmentItemListBinding;
 
 import java.util.List;
@@ -26,11 +25,10 @@ public interface ItemListView {
         layoutManager.setStackFromEnd(true);
 
         binding.list.setLayoutManager(layoutManager);
+        binding.list.addItemDecoration(new SimpleDividerItemDecoration(context));
 
         ItemListAdapter adapter = new ItemListAdapter();
         binding.list.setAdapter(adapter);
-
-        binding.list.addItemDecoration(new SimpleOffsetItemDecoration(context));
 
         return new ItemListView() {
             @Override
@@ -44,7 +42,7 @@ public interface ItemListView {
             }
 
             @Override
-            public void bind(List<StrId> list) {
+            public void bind(List<ItemListAdapter.ViewItem> list) {
                 adapter.submitList(list);
             }
 
@@ -90,7 +88,7 @@ public interface ItemListView {
 
     void showLoading(boolean isShow);
 
-    void bind(List<StrId> list);
+    void bind(List<ItemListAdapter.ViewItem> list);
 
     void setCallback(Callback callback);
 
