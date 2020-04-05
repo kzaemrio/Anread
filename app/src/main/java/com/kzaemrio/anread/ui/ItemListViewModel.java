@@ -8,7 +8,7 @@ import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
 import com.kzaemrio.anread.model.ItemPosition;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -66,31 +66,26 @@ public class ItemListViewModel extends AndroidViewModel {
     }
 
     public void updateItemList() {
-        Actions.executeOnDiskIO(this::loadOnLine);
+        Actions.executeOnDiskIO(() -> {
+            loadCache();
+            loadOnLine();
+        });
     }
 
-    private void loadOnLine() {
-        mIsShowLoading.postValue(true);
-        List<Item> list = mChannelList.stream()
-                .map(url -> {
-                    try {
-                        return Actions.getItemArray(url);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return new Item[0];
-                    }
-                })
-                .peek(array -> Arrays.sort(array, Comparator.<Item, Long>comparing(i -> i.mPubDate).reversed()))
-                .flatMap(Stream::of)
+    private void loadCache() {
+        List<ItemListAdapter.ViewItem> list = mChannelList.stream()
+                .map(AppDatabaseHolder.of(getApplication()).itemDao()::queryBy)
+                .flatMap(List::stream)
                 .sorted(Comparator.<Item, Long>comparing(i -> i.mPubDate).reversed())
+                .map(ItemListAdapter.ViewItem::create)
                 .collect(Collectors.toList());
-        List<ItemListAdapter.ViewItem> itemList = toStrIdList(list);
-        mItemList.postValue(itemList);
+
+        mItemList.postValue(list);
 
         ItemPosition itemPosition = AppDatabaseHolder.of(getApplication()).itemPositionDao().query(mChannelList.toString());
         if (itemPosition != null) {
-            for (int i = 0; i < itemList.size(); i++) {
-                ItemListAdapter.ViewItem item = itemList.get(i);
+            for (int i = 0; i < list.size(); i++) {
+                ItemListAdapter.ViewItem item = list.get(i);
 
                 if (item.getItem().mLink.equals(itemPosition.mItemId)) {
                     mItemPosition.postValue(AdapterItemPosition.create(
@@ -101,15 +96,40 @@ public class ItemListViewModel extends AndroidViewModel {
                 }
             }
         }
-        mIsShowLoading.postValue(false);
-
-        AppDatabaseHolder.of(getApplication()).itemDao().insert(list.toArray(new Item[0]));
     }
 
-    private static List<ItemListAdapter.ViewItem> toStrIdList(List<Item> itemList) {
-        return itemList.stream()
+    private void loadOnLine() {
+        mIsShowLoading.postValue(true);
+        List<ItemListAdapter.ViewItem> cacheList = Objects.requireNonNull(mItemList.getValue());
+
+        List<ItemListAdapter.ViewItem> newList = mChannelList.stream()
+                .map(url -> {
+                    try {
+                        return Actions.getItemArray(url);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        return new Item[0];
+                    }
+                })
+                .flatMap(Stream::of)
+                .filter(item -> item.mPubDate > cacheList.get(0).getItem().mPubDate)
+                .sorted(Comparator.<Item, Long>comparing(i -> i.mPubDate).reversed())
                 .map(ItemListAdapter.ViewItem::create)
                 .collect(Collectors.toList());
+
+        ArrayList<ItemListAdapter.ViewItem> result = new ArrayList<>(newList.size() + cacheList.size());
+        result.addAll(newList);
+        result.addAll(cacheList);
+        mItemList.postValue(result);
+
+        mIsShowLoading.postValue(false);
+
+        if (newList.size() > 0) {
+            mHasNew.postValue(newList.size());
+            AppDatabaseHolder.of(getApplication()).itemDao().insert(
+                    newList.stream().map(ItemListAdapter.ViewItem::getItem).toArray(Item[]::new)
+            );
+        }
     }
 
     public void saveItemPosition(int adapterPosition, int offset) {
