@@ -67,12 +67,13 @@ public class ItemListViewModel extends AndroidViewModel {
 
     public void updateItemList() {
         Actions.executeOnDiskIO(() -> {
-            loadCache();
-            loadOnLine();
+            mIsShowLoading.postValue(true);
+            loadOnLine(loadCache());
+            mIsShowLoading.postValue(false);
         });
     }
 
-    private void loadCache() {
+    private List<ItemListAdapter.ViewItem> loadCache() {
         List<ItemListAdapter.ViewItem> list = mChannelList.stream()
                 .map(AppDatabaseHolder.of(getApplication()).itemDao()::queryBy)
                 .flatMap(List::stream)
@@ -96,12 +97,11 @@ public class ItemListViewModel extends AndroidViewModel {
                 }
             }
         }
+
+        return list;
     }
 
-    private void loadOnLine() {
-        mIsShowLoading.postValue(true);
-        List<ItemListAdapter.ViewItem> cacheList = Objects.requireNonNull(mItemList.getValue());
-
+    private void loadOnLine(List<ItemListAdapter.ViewItem> cacheList) {
         List<ItemListAdapter.ViewItem> newList = mChannelList.stream()
                 .map(url -> {
                     try {
@@ -121,8 +121,6 @@ public class ItemListViewModel extends AndroidViewModel {
         result.addAll(newList);
         result.addAll(cacheList);
         mItemList.postValue(result);
-
-        mIsShowLoading.postValue(false);
 
         if (newList.size() > 0) {
             mHasNew.postValue(newList.size());

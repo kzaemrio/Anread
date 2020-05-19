@@ -21,6 +21,8 @@ public interface ItemListView {
     static ItemListView create(Context context) {
         FragmentItemListBinding binding = FragmentItemListBinding.inflate(LayoutInflater.from(context));
 
+        binding.list.setHasFixedSize(true);
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(context);
         layoutManager.setStackFromEnd(true);
 
