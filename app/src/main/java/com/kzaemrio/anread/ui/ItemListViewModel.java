@@ -112,7 +112,7 @@ public class ItemListViewModel extends AndroidViewModel {
                     }
                 })
                 .flatMap(Stream::of)
-                .filter(item -> item.mPubDate > cacheList.get(0).getItem().mPubDate)
+                .filter(item -> item.mPubDate > (cacheList.size() > 0 ? cacheList.get(0).getItem().mPubDate : 0))
                 .sorted(Comparator.<Item, Long>comparing(i -> i.mPubDate).reversed())
                 .map(ItemListAdapter.ViewItem::create)
                 .collect(Collectors.toList());
