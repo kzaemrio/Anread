@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,15 +18,13 @@ public class ItemListFragment extends Fragment {
 
     public static final String TAG = "ItemListFragment";
 
-    private static final String KEY_CHANNEL_LIST = "KEY_CHANNEL_LIST";
-
     private ItemListView mView;
     private ItemListViewModel mModel;
 
     public static void attach(FragmentActivity activity, int frameId, List<String> channelUrls) {
         Fragment fragment = new ItemListFragment();
         Bundle args = new Bundle();
-        args.putStringArrayList(KEY_CHANNEL_LIST, new ArrayList<>(channelUrls));
+        args.putStringArrayList(ItemListViewModel.KEY_CHANNEL_LIST, new ArrayList<>(channelUrls));
         fragment.setArguments(args);
 
         activity.getSupportFragmentManager()
@@ -65,7 +62,7 @@ public class ItemListFragment extends Fragment {
         mModel.getHasNew().observe(getViewLifecycleOwner(), mView::alertHasNew);
         mModel.getItemList().observe(getViewLifecycleOwner(), mView::bind);
         mModel.getItemPosition().observe(getViewLifecycleOwner(), mView::scrollTo);
-        mModel.setChannelList(Objects.requireNonNull(getArguments()).getStringArrayList(KEY_CHANNEL_LIST));
+
         mModel.updateItemList();
     }
 

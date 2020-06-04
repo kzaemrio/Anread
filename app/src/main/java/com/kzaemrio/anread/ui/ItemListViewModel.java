@@ -19,22 +19,22 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.SavedStateHandle;
 
 public class ItemListViewModel extends AndroidViewModel {
 
-    private List<String> mChannelList;
+    public static final String KEY_CHANNEL_LIST = "KEY_CHANNEL_LIST";
+
+    private final List<String> mChannelList;
 
     private MutableLiveData<Boolean> mIsShowLoading;
     private MutableLiveData<Integer> mHasNew;
     private MutableLiveData<List<ItemListAdapter.ViewItem>> mItemList;
     private MutableLiveData<AdapterItemPosition> mItemPosition;
 
-    public ItemListViewModel(@NonNull Application application) {
+    public ItemListViewModel(@NonNull Application application, SavedStateHandle handle) {
         super(application);
-    }
-
-    public void setChannelList(List<String> channelList) {
-        mChannelList = channelList;
+        mChannelList = handle.get(KEY_CHANNEL_LIST);
     }
 
     public LiveData<Boolean> getIsShowLoading() {
