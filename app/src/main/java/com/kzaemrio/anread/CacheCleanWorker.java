@@ -46,7 +46,7 @@ public class CacheCleanWorker extends Worker {
     @Override
     public Result doWork() {
         ItemDao dao = AppDatabaseHolder.of(getApplicationContext()).itemDao();
-        long time = Instant.now().minus(2, ChronoUnit.DAYS).toEpochMilli();
+        long time = Instant.now().minus(12, ChronoUnit.HOURS).toEpochMilli();
         Item[] items = dao.queryBy(time);
         dao.delete(items);
         return Result.success();
