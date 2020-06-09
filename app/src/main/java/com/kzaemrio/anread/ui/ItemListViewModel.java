@@ -3,6 +3,7 @@ package com.kzaemrio.anread.ui;
 import android.app.Application;
 
 import com.kzaemrio.anread.Actions;
+import com.kzaemrio.anread.CacheCleanWorker;
 import com.kzaemrio.anread.adapter.ItemListAdapter;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
@@ -27,41 +28,37 @@ public class ItemListViewModel extends AndroidViewModel {
 
     private final List<String> mChannelList;
 
-    private MutableLiveData<Boolean> mIsShowLoading;
-    private MutableLiveData<Integer> mHasNew;
-    private MutableLiveData<List<ItemListAdapter.ViewItem>> mItemList;
-    private MutableLiveData<AdapterItemPosition> mItemPosition;
+    private final MutableLiveData<Boolean> mIsShowLoading;
+    private final MutableLiveData<Integer> mHasNew;
+    private final MutableLiveData<List<ItemListAdapter.ViewItem>> mItemList;
+    private final MutableLiveData<AdapterItemPosition> mItemPosition;
 
     public ItemListViewModel(@NonNull Application application, SavedStateHandle handle) {
         super(application);
+
+        CacheCleanWorker.work(application.getApplicationContext());
+
         mChannelList = handle.get(KEY_CHANNEL_LIST);
+
+        mIsShowLoading = new MutableLiveData<>();
+        mHasNew = new MutableLiveData<>();
+        mItemList = new MutableLiveData<>();
+        mItemPosition = new MutableLiveData<>();
     }
 
     public LiveData<Boolean> getIsShowLoading() {
-        if (mIsShowLoading == null) {
-            mIsShowLoading = new MutableLiveData<>();
-        }
         return mIsShowLoading;
     }
 
     public LiveData<Integer> getHasNew() {
-        if (mHasNew == null) {
-            mHasNew = new MutableLiveData<>();
-        }
         return mHasNew;
     }
 
     public LiveData<List<ItemListAdapter.ViewItem>> getItemList() {
-        if (mItemList == null) {
-            mItemList = new MutableLiveData<>();
-        }
         return mItemList;
     }
 
     public LiveData<AdapterItemPosition> getItemPosition() {
-        if (mItemPosition == null) {
-            mItemPosition = new MutableLiveData<>();
-        }
         return mItemPosition;
     }
 
@@ -74,10 +71,10 @@ public class ItemListViewModel extends AndroidViewModel {
     }
 
     private List<ItemListAdapter.ViewItem> loadCache() {
-        List<ItemListAdapter.ViewItem> list = mChannelList.stream()
-                .map(AppDatabaseHolder.of(getApplication()).itemDao()::queryBy)
-                .flatMap(List::stream)
-                .sorted(Comparator.<Item, Long>comparing(i -> i.mPubDate).reversed())
+        List<ItemListAdapter.ViewItem> list = AppDatabaseHolder.of(getApplication())
+                .itemDao()
+                .queryBy(mChannelList.toArray(new String[0]))
+                .stream()
                 .map(ItemListAdapter.ViewItem::create)
                 .collect(Collectors.toList());
 

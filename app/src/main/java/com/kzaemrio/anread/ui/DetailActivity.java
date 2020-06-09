@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,7 +14,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.R;
 import com.kzaemrio.anread.databinding.ActivityDetailBinding;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
@@ -29,13 +27,13 @@ import org.threeten.bp.format.DateTimeFormatter;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.LiveData;
 
 public class DetailActivity extends BaseActivity {
 
     private static final String EXTRA_LINK = "EXTRA_LINK";
 
-    private MutableLiveData<Item> mItem;
+    private LiveData<Item> mItem;
 
     public static Intent createIntent(Activity activity, String link) {
         return new Intent(activity, DetailActivity.class).putExtra(EXTRA_LINK, link);
@@ -48,7 +46,10 @@ public class DetailActivity extends BaseActivity {
         DetailView detailView = DetailView.create(this);
         setContentView(detailView.getContentView());
 
-        mItem = new MutableLiveData<>();
+        String link = getIntent().getStringExtra(EXTRA_LINK);
+
+        mItem = AppDatabaseHolder.of(this).itemDao().query(link);
+
         mItem.observe(this, item -> {
             invalidateOptionsMenu();
             String pubDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(item.mPubDate), ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' HH:mm"));
@@ -60,13 +61,6 @@ public class DetailActivity extends BaseActivity {
                     item.mDes;
             detailView.bind(html);
         });
-
-        String link = getIntent().getStringExtra(EXTRA_LINK);
-        if (!TextUtils.isEmpty(link)) {
-            Actions.executeOnDiskIO(() -> {
-                mItem.postValue(AppDatabaseHolder.of(this).itemDao().query(link));
-            });
-        }
     }
 
     @Override

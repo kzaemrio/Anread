@@ -2,8 +2,8 @@ package com.kzaemrio.anread.model;
 
 import java.util.List;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -11,20 +11,17 @@ import androidx.room.Query;
 @Dao
 public interface ItemDao {
     @Query("SELECT * FROM Item Where mLink = (:link)")
-    Item query(String link);
+    LiveData<Item> query(String link);
 
-    @Query("SELECT * FROM Item Where mChannelUrl = (:channelUrl) Order by mPubDate DESC")
-    List<Item> queryBy(String channelUrl);
-
-    @Query("SELECT * FROM Item Where mPubDate < (:time)")
-    Item[] queryBy(long time);
+    @Query("SELECT * FROM Item Where mChannelUrl in (:channels) Order by mPubDate DESC")
+    List<Item> queryBy(String... channels);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insert(Item... subscriptions);
 
-    @Delete
-    void delete(Item... items);
+    @Query("delete from Item Where mPubDate < (:time)")
+    void deleteBefore(long time);
 
     @Query("DELETE FROM Item Where mChannelUrl = (:channelUrl)")
-    void delete(String channelUrl);
+    void deleteBy(String channelUrl);
 }

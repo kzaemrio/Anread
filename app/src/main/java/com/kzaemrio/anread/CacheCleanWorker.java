@@ -3,8 +3,6 @@ package com.kzaemrio.anread;
 import android.content.Context;
 
 import com.kzaemrio.anread.model.AppDatabaseHolder;
-import com.kzaemrio.anread.model.Item;
-import com.kzaemrio.anread.model.ItemDao;
 
 import org.threeten.bp.Instant;
 import org.threeten.bp.temporal.ChronoUnit;
@@ -45,10 +43,7 @@ public class CacheCleanWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        ItemDao dao = AppDatabaseHolder.of(getApplicationContext()).itemDao();
-        long time = Instant.now().minus(12, ChronoUnit.HOURS).toEpochMilli();
-        Item[] items = dao.queryBy(time);
-        dao.delete(items);
+        AppDatabaseHolder.of(getApplicationContext()).itemDao().deleteBefore(Instant.now().minus(12, ChronoUnit.HOURS).toEpochMilli());
         return Result.success();
     }
 }

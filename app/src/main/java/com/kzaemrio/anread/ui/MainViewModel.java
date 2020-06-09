@@ -25,7 +25,6 @@ public class MainViewModel extends AndroidViewModel {
 
     public MainViewModel(@NonNull Application application) {
         super(application);
-        CacheCleanWorker.work(application.getApplicationContext());
 
         mIsSyncOn = new MutableLiveData<>(sharedPreferences().getBoolean(PREF_KEY, false));
 

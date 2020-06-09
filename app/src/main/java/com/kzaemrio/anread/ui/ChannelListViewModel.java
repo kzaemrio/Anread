@@ -32,7 +32,7 @@ public class ChannelListViewModel extends AndroidViewModel {
         Actions.executeOnDiskIO(() -> {
             AppDatabase appDatabase = AppDatabaseHolder.of(getApplication());
 
-            appDatabase.itemDao().delete(channel.getUrl());
+            appDatabase.itemDao().deleteBy(channel.getUrl());
 
             appDatabase.itemPositionDao().delete(Collections.singleton(channel.getUrl()).toString());
 
