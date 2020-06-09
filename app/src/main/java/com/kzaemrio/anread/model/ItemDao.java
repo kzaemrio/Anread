@@ -10,9 +10,6 @@ import androidx.room.Query;
 
 @Dao
 public interface ItemDao {
-    @Query("SELECT * FROM Item Order by mPubDate DESC")
-    List<Item> getAll();
-
     @Query("SELECT * FROM Item Where mLink = (:link)")
     Item query(String link);
 
@@ -27,4 +24,7 @@ public interface ItemDao {
 
     @Delete
     void delete(Item... items);
+
+    @Query("DELETE FROM Item Where mChannelUrl = (:channelUrl)")
+    void delete(String channelUrl);
 }

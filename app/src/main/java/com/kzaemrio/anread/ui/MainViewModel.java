@@ -4,9 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.kzaemrio.anread.Actions;
 import com.kzaemrio.anread.CacheCleanWorker;
-import com.kzaemrio.anread.CacheFeedWorker;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Channel;
 
@@ -22,51 +20,37 @@ public class MainViewModel extends AndroidViewModel {
 
     private static final String PREF_KEY = "isSyncOn";
 
-    private MutableLiveData<Boolean> mIsSyncOn;
-    private MutableLiveData<List<Channel>> mChannelList;
+    private final MutableLiveData<Boolean> mIsSyncOn;
+    private final LiveData<List<Channel>> mChannelList;
 
     public MainViewModel(@NonNull Application application) {
         super(application);
         CacheCleanWorker.work(application.getApplicationContext());
+
+        mIsSyncOn = new MutableLiveData<>(sharedPreferences().getBoolean(PREF_KEY, false));
+
+        mChannelList = AppDatabaseHolder.of(application).channelDao().getAll();
     }
 
-
     public LiveData<Boolean> getIsSyncOn() {
-        if (mIsSyncOn == null) {
-            mIsSyncOn = new MutableLiveData<>();
-            boolean isSync = gSharedPreferences().getBoolean(PREF_KEY, false);
-            CacheFeedWorker.update(getApplication().getApplicationContext(), isSync);
-            mIsSyncOn.setValue(isSync);
-        }
         return mIsSyncOn;
+    }
+
+    public LiveData<List<Channel>> getChannelList() {
+        return mChannelList;
     }
 
     public void switchSync() {
         boolean isSync = !Objects.requireNonNull(mIsSyncOn.getValue());
-        gSharedPreferences().edit().putBoolean(PREF_KEY, isSync).apply();
-        CacheFeedWorker.update(getApplication().getApplicationContext(), isSync);
+        sharedPreferences().edit().putBoolean(PREF_KEY, isSync).apply();
         mIsSyncOn.setValue(isSync);
     }
 
-    private SharedPreferences gSharedPreferences() {
+    private SharedPreferences sharedPreferences() {
         Context context = getApplication();
         return context.getSharedPreferences(
                 context.getPackageName() + "_preferences",
                 Context.MODE_PRIVATE
         );
-    }
-
-
-    public LiveData<List<Channel>> getChannelList() {
-        if (mChannelList == null) {
-            mChannelList = new MutableLiveData<>();
-        }
-        return mChannelList;
-    }
-
-    public void updateChannelList() {
-        Actions.executeOnDiskIO(() -> {
-            mChannelList.postValue(AppDatabaseHolder.of(getApplication()).channelDao().getAll());
-        });
     }
 }

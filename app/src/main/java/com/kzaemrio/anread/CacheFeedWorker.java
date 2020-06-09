@@ -62,7 +62,7 @@ public class CacheFeedWorker extends Worker {
         try {
             AppDatabase database = AppDatabaseHolder.of(getApplicationContext());
             ChannelDao dao = database.channelDao();
-            List<Channel> all = dao.getAll();
+            List<Channel> all = dao.getAll().getValue();
             List<Item> itemList = new LinkedList<>();
             for (Channel channel : all) {
                 Collections.addAll(itemList, Actions.getItemArray(channel.getUrl()));

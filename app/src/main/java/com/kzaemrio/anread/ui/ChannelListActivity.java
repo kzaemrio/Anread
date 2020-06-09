@@ -40,15 +40,11 @@ public class ChannelListActivity extends BaseActivity {
         MvpView view = MvpView.create(
                 this,
                 channel -> Router.toChannel(this, channel.getTitle(), channel.getUrl()),
-                channel -> {
-                    setResult(RESULT_OK);
-                    mViewModel.delete(channel);
-                }
+                channel -> mViewModel.delete(channel)
         );
         setContentView(view.getContentView());
 
-        mViewModel.getData().observe(this, view::bind);
-        mViewModel.loadChannelList();
+        mViewModel.getChannelList().observe(this, view::bind);
     }
 
     @Override
@@ -65,39 +61,13 @@ public class ChannelListActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case Router.REQUEST_ADD_CHANNEL:
-                    setResult(RESULT_OK);
-                    mViewModel.loadChannelList();
-                    break;
-                case Router.REQUEST_CHANNEL:
-                    setResult(RESULT_OK);
-                    break;
-            }
-        }
-    }
-
     private interface Router {
-
-        int REQUEST_ADD_CHANNEL = 1;
-        int REQUEST_CHANNEL = 2;
-
         static void toAddChannel(Activity activity) {
-            activity.startActivityForResult(
-                    AddChannelActivity.createIntent(activity),
-                    REQUEST_ADD_CHANNEL
-            );
+            activity.startActivity(AddChannelActivity.createIntent(activity));
         }
 
         static void toChannel(Activity activity, String channelTitle, String channelUrl) {
-            activity.startActivityForResult(
-                    ChannelActivity.createIntent(activity, channelTitle, channelUrl),
-                    REQUEST_CHANNEL
-            );
+            activity.startActivity(ChannelActivity.createIntent(activity, channelTitle, channelUrl));
         }
     }
 

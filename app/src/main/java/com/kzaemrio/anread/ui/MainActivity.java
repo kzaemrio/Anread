@@ -1,18 +1,17 @@
 package com.kzaemrio.anread.ui;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.kzaemrio.anread.CacheFeedWorker;
 import com.kzaemrio.anread.R;
 import com.kzaemrio.anread.model.Channel;
 
 import java.util.List;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
 public class MainActivity extends BaseActivity {
@@ -29,6 +28,8 @@ public class MainActivity extends BaseActivity {
         setContentView(view.getContentView());
 
         mViewModel.getIsSyncOn().observe(this, is -> {
+            CacheFeedWorker.update(getApplication().getApplicationContext(), is);
+
             invalidateOptionsMenu();
 
             if (mViewModel.getChannelList().getValue() != null) {
@@ -44,8 +45,6 @@ public class MainActivity extends BaseActivity {
                 view.bind(list);
             }
         });
-
-        mViewModel.updateChannelList();
     }
 
     @Override
@@ -87,22 +86,9 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == RESULT_OK && requestCode == Router.REQUEST_CODE_SUBSCRIPTION_LIST) {
-            mViewModel.updateChannelList();
-        }
-    }
-
     private interface Router {
-        int REQUEST_CODE_SUBSCRIPTION_LIST = 1;
-
         static void toSubscriptionList(Activity activity) {
-            activity.startActivityForResult(
-                    ChannelListActivity.createIntent(activity),
-                    REQUEST_CODE_SUBSCRIPTION_LIST
-            );
+            activity.startActivity(ChannelListActivity.createIntent(activity));
         }
     }
 }

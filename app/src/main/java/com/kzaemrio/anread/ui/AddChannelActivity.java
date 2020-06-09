@@ -33,14 +33,7 @@ public class AddChannelActivity extends BaseActivity {
                 try {
                     Channel channel = Actions.getChannel(input);
                     AppDatabaseHolder.of(getApplication()).channelDao().insert(channel);
-                    Actions.executeOnMainThread(() -> {
-                        view.showLoading(false);
-                        setResult(RESULT_OK, new Intent().putExtra(
-                                "url",
-                                channel.getUrl())
-                        );
-                        finish();
-                    });
+                    finish();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

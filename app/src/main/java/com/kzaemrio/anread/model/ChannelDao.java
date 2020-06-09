@@ -2,8 +2,8 @@ package com.kzaemrio.anread.model;
 
 import java.util.List;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -11,11 +11,11 @@ import androidx.room.Query;
 @Dao
 public interface ChannelDao {
     @Query("SELECT * FROM Channel ORDER BY mCreateTime")
-    List<Channel> getAll();
+    LiveData<List<Channel>> getAll();
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(Channel... channels);
+    void insert(Channel channel);
 
-    @Delete
-    void delete(Channel... channels);
+    @Query("Delete From Channel Where mUrl = (:url)")
+    void delete(String url);
 }
