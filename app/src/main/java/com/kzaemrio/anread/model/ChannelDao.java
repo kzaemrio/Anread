@@ -16,6 +16,6 @@ public interface ChannelDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(Channel channel);
 
-    @Query("Delete From Channel Where mUrl = (:url)")
+    @Query("DELETE FROM Channel WHERE mUrl = (:url)")
     void delete(String url);
 }
