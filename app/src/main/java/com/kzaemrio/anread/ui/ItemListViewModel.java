@@ -86,7 +86,7 @@ public class ItemListViewModel extends AndroidViewModel {
         ItemPosition itemPosition = AppDatabaseHolder.of(getApplication()).itemPositionDao().query(mChannelList.toString());
         if (itemPosition != null) {
             int index = Actions.binarySearch(list, itemPosition.mPubDate, it -> it.getItem().mPubDate);
-            if (index > 0) {
+            if (index >= 0) {
                 mItemPosition.postValue(AdapterItemPosition.create(
                         index,
                         itemPosition.mOffset
