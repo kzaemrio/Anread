@@ -1,14 +1,9 @@
 package com.kzaemrio.anread.ui;
 
 import android.content.Context;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
 
-import com.google.android.material.snackbar.Snackbar;
-import com.kzaemrio.anread.R;
 import com.kzaemrio.anread.adapter.ItemListAdapter;
 import com.kzaemrio.anread.adapter.SimpleDividerItemDecoration;
 import com.kzaemrio.anread.databinding.FragmentItemListBinding;
@@ -68,21 +63,6 @@ public interface ItemListView {
             public int getOffset() {
                 return binding.list.getChildAt(0).getTop();
             }
-
-            @Override
-            public void alertHasNew(int count) {
-                Snackbar snackbar = Snackbar.make(
-                        binding.getRoot(),
-                        context.getString(R.string.alert_has_new, count),
-                        Snackbar.LENGTH_SHORT
-                );
-                View view = snackbar.getView();
-                FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) view.getLayoutParams();
-                layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
-                layoutParams.gravity = Gravity.CENTER_HORIZONTAL | Gravity.TOP;
-                view.setLayoutParams(layoutParams);
-                snackbar.show();
-            }
         };
     }
 
@@ -99,8 +79,6 @@ public interface ItemListView {
     int getAdapterPosition();
 
     int getOffset();
-
-    void alertHasNew(int count);
 
     interface Callback {
         void onRefresh();

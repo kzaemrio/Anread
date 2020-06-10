@@ -27,7 +27,6 @@ public class ItemListViewModel extends AndroidViewModel {
     private final List<String> mChannelList;
 
     private final MutableLiveData<Boolean> mIsShowLoading;
-    private final MutableLiveData<Integer> mHasNew;
     private final MutableLiveData<List<ItemListAdapter.ViewItem>> mItemList;
     private final MutableLiveData<AdapterItemPosition> mItemPosition;
 
@@ -37,17 +36,12 @@ public class ItemListViewModel extends AndroidViewModel {
         mChannelList = handle.get(KEY_CHANNEL_LIST);
 
         mIsShowLoading = new MutableLiveData<>();
-        mHasNew = new MutableLiveData<>();
         mItemList = new MutableLiveData<>();
         mItemPosition = new MutableLiveData<>();
     }
 
     public LiveData<Boolean> getIsShowLoading() {
         return mIsShowLoading;
-    }
-
-    public LiveData<Integer> getHasNew() {
-        return mHasNew;
     }
 
     public LiveData<List<ItemListAdapter.ViewItem>> getItemList() {
@@ -81,16 +75,20 @@ public class ItemListViewModel extends AndroidViewModel {
                 .map(ItemListAdapter.ViewItem::create)
                 .collect(Collectors.toList());
 
+        boolean isInit = mItemList.getValue() == null;
+
         mItemList.postValue(list);
 
-        ItemPosition itemPosition = AppDatabaseHolder.of(getApplication()).itemPositionDao().query(mChannelList.toString());
-        if (itemPosition != null) {
-            int index = Actions.binarySearch(list, itemPosition.mPubDate, it -> it.getItem().mPubDate);
-            if (index >= 0) {
-                mItemPosition.postValue(AdapterItemPosition.create(
-                        index,
-                        itemPosition.mOffset
-                ));
+        if (isInit) {
+            ItemPosition itemPosition = AppDatabaseHolder.of(getApplication()).itemPositionDao().query(mChannelList.toString());
+            if (itemPosition != null) {
+                int index = Actions.binarySearch(list, itemPosition.mPubDate, it -> it.getItem().mPubDate);
+                if (index >= 0) {
+                    mItemPosition.postValue(AdapterItemPosition.create(
+                            index,
+                            itemPosition.mOffset
+                    ));
+                }
             }
         }
 
