@@ -35,7 +35,7 @@ public class CacheCleanWorker extends Worker {
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 CacheCleanWorker.NAME,
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.KEEP,
                 request
         );
     }
@@ -43,7 +43,9 @@ public class CacheCleanWorker extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        AppDatabaseHolder.of(getApplicationContext()).itemDao().deleteBefore(Instant.now().minus(12, ChronoUnit.HOURS).toEpochMilli());
+        AppDatabaseHolder.of(getApplicationContext())
+                .itemDao()
+                .deleteBefore(Instant.now().minus(1, ChronoUnit.DAYS).toEpochMilli());
         return Result.success();
     }
 }

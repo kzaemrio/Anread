@@ -48,7 +48,7 @@ public class CacheFeedWorker extends Worker {
 
             manager.enqueueUniquePeriodicWork(
                     CacheFeedWorker.NAME,
-                    ExistingPeriodicWorkPolicy.REPLACE,
+                    ExistingPeriodicWorkPolicy.KEEP,
                     request
             );
         } else {
