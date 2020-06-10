@@ -3,7 +3,6 @@ package com.kzaemrio.anread.ui;
 import android.app.Application;
 
 import com.kzaemrio.anread.Actions;
-import com.kzaemrio.anread.CacheCleanWorker;
 import com.kzaemrio.anread.adapter.ItemListAdapter;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
@@ -35,8 +34,6 @@ public class ItemListViewModel extends AndroidViewModel {
 
     public ItemListViewModel(@NonNull Application application, SavedStateHandle handle) {
         super(application);
-
-        CacheCleanWorker.work(application.getApplicationContext());
 
         mChannelList = handle.get(KEY_CHANNEL_LIST);
 
