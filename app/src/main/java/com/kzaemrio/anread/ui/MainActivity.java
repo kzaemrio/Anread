@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.kzaemrio.anread.CacheFeedWorker;
 import com.kzaemrio.anread.R;
 import com.kzaemrio.anread.model.Channel;
 
@@ -28,8 +27,6 @@ public class MainActivity extends BaseActivity {
         setContentView(view.getContentView());
 
         mViewModel.getIsSyncOn().observe(this, is -> {
-            CacheFeedWorker.update(getApplication().getApplicationContext(), is);
-
             invalidateOptionsMenu();
 
             if (mViewModel.getChannelList().getValue() != null) {
