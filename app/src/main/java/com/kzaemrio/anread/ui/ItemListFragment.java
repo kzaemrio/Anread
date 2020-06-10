@@ -88,6 +88,7 @@ public class ItemListFragment extends Fragment {
         mModel.getIsShowLoading().observe(getViewLifecycleOwner(), mView::showLoading);
         mModel.getItemList().observe(getViewLifecycleOwner(), mView::bind);
         mModel.getItemPosition().observe(getViewLifecycleOwner(), mView::scrollTo);
+        mModel.getNewCount().observe(getViewLifecycleOwner(),mView::setNewCount);
 
         mModel.updateItemList();
     }

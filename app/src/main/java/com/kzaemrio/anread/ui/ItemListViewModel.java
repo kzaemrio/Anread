@@ -29,6 +29,7 @@ public class ItemListViewModel extends AndroidViewModel {
     private final MutableLiveData<Boolean> mIsShowLoading;
     private final MutableLiveData<List<ItemListAdapter.ViewItem>> mItemList;
     private final MutableLiveData<AdapterItemPosition> mItemPosition;
+    private final MutableLiveData<Integer> mNewCount;
 
     public ItemListViewModel(@NonNull Application application, SavedStateHandle handle) {
         super(application);
@@ -38,6 +39,7 @@ public class ItemListViewModel extends AndroidViewModel {
         mIsShowLoading = new MutableLiveData<>();
         mItemList = new MutableLiveData<>();
         mItemPosition = new MutableLiveData<>();
+        mNewCount = new MutableLiveData<>();
     }
 
     public LiveData<Boolean> getIsShowLoading() {
@@ -50,6 +52,10 @@ public class ItemListViewModel extends AndroidViewModel {
 
     public LiveData<AdapterItemPosition> getItemPosition() {
         return mItemPosition;
+    }
+
+    public LiveData<Integer> getNewCount() {
+        return mNewCount;
     }
 
     public void updateItemList() {
@@ -88,6 +94,10 @@ public class ItemListViewModel extends AndroidViewModel {
                             index,
                             itemPosition.mOffset
                     ));
+
+                    if (index > 0) {
+                        mNewCount.postValue(index);
+                    }
                 }
             }
         }
@@ -109,9 +119,7 @@ public class ItemListViewModel extends AndroidViewModel {
     }
 
     public void clearItem() {
-        Actions.executeOnDiskIO(() -> {
-            AppDatabaseHolder.of(getApplication()).itemDao().clear();
-        });
+        Actions.executeOnDiskIO(() -> AppDatabaseHolder.of(getApplication()).itemDao().clear());
     }
 
     public interface AdapterItemPosition {
