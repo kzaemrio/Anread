@@ -5,14 +5,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/sync"
-        android:icon="@drawable/ic_sync_disabled_24dp"
-        android:title="@string/menu_to_sync"
-        app:showAsAction="never" />
-
-    <item
         android:id="@+id/rss"
         android:icon="@drawable/ic_rss_feed_white_24dp"
         android:title="@string/menu_rss"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
 </menu>

@@ -26,14 +26,6 @@ public class MainActivity extends BaseActivity {
         MainView view = MainView.create(this);
         setContentView(view.getContentView());
 
-        mViewModel.getIsSyncOn().observe(this, is -> {
-            invalidateOptionsMenu();
-
-            if (mViewModel.getChannelList().getValue() != null) {
-                view.showSyncToast(is);
-            }
-        });
-
         mViewModel.getChannelList().observe(this, list -> {
             if (list.isEmpty()) {
                 view.showAddSubscription();
@@ -53,18 +45,11 @@ public class MainActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
 
-        MenuItem itemSync = menu.findItem(R.id.sync);
         MenuItem itemRss = menu.findItem(R.id.rss);
-
-        Boolean isSyncOn = mViewModel.getIsSyncOn().getValue();
-        boolean isSyncOnValue = isSyncOn != null && isSyncOn;
-        itemSync.setTitle(isSyncOnValue ? R.string.menu_to_sync_cancel : R.string.menu_to_sync);
-        itemSync.setIcon(isSyncOnValue ? R.drawable.ic_sync_24dp : R.drawable.ic_sync_disabled_24dp);
 
         List<Channel> channelList = mViewModel.getChannelList().getValue();
         boolean hasChannelList = channelList != null && channelList.size() > 0;
 
-        itemSync.setVisible(hasChannelList);
         itemRss.setVisible(hasChannelList);
         return super.onCreateOptionsMenu(menu);
     }
@@ -74,9 +59,6 @@ public class MainActivity extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.rss:
                 Router.toSubscriptionList(this);
-                return true;
-            case R.id.sync:
-                mViewModel.switchSync();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
