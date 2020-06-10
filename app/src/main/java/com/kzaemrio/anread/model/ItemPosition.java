@@ -12,16 +12,16 @@ public class ItemPosition {
     public String mGroupId;
 
     @ColumnInfo
-    public String mItemId;
+    public long mPubDate;
 
     @ColumnInfo
     public int mOffset;
 
-    public static ItemPosition create(String groupId, String itemId, int offset) {
-        ItemPosition itemPosition = new ItemPosition();
-        itemPosition.mGroupId = groupId;
-        itemPosition.mItemId = itemId;
-        itemPosition.mOffset = offset;
-        return itemPosition;
+    public static ItemPosition create(String groupId, long pubDate, int offset) {
+        ItemPosition it = new ItemPosition();
+        it.mGroupId = groupId;
+        it.mPubDate = pubDate;
+        it.mOffset = offset;
+        return it;
     }
 }

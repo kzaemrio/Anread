@@ -12,6 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 
 public class ItemListFragment extends Fragment {
@@ -31,6 +34,30 @@ public class ItemListFragment extends Fragment {
                 .beginTransaction()
                 .replace(frameId, fragment, TAG)
                 .commit();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        getLifecycle().addObserver(new LifecycleEventObserver() {
+            @Override
+            public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
+                if (Lifecycle.Event.ON_PAUSE == event) {
+                    if (!isRemoving()) {
+                        mModel.saveItemPosition(mView.getAdapterPosition(), mView.getOffset());
+                    }
+                }
+            }
+        });
+
+        getLifecycle().addObserver(new LifecycleEventObserver() {
+            @Override
+            public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
+                if (Lifecycle.Event.ON_DESTROY == event) {
+                    mModel.clearItem();
+                }
+            }
+        });
     }
 
     @Nullable
@@ -64,14 +91,6 @@ public class ItemListFragment extends Fragment {
         mModel.getItemPosition().observe(getViewLifecycleOwner(), mView::scrollTo);
 
         mModel.updateItemList();
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (!isRemoving()) {
-            mModel.saveItemPosition(mView.getAdapterPosition(), mView.getOffset());
-        }
     }
 
     private interface Router {

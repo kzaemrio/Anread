@@ -11,7 +11,12 @@ import org.simpleframework.xml.core.Persister;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.AbstractList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
 
 import androidx.arch.core.executor.ArchTaskExecutor;
 import okhttp3.OkHttpClient;
@@ -57,5 +62,23 @@ public interface Actions {
         }
 
         throw new IllegalArgumentException("error rss url: " + url);
+    }
+
+    static <T, V extends Comparable<? super V>> int binarySearch(List<T> list, V key, Function<T, V> mapper) {
+        return Collections.binarySearch(mapList(list, mapper), key, Comparator.reverseOrder());
+    }
+
+    static <T, V> List<V> mapList(List<T> list, Function<T, V> mapper) {
+        return new AbstractList<V>() {
+            @Override
+            public V get(int index) {
+                return mapper.apply(list.get(index));
+            }
+
+            @Override
+            public int size() {
+                return list.size();
+            }
+        };
     }
 }

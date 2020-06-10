@@ -8,7 +8,6 @@ import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Item;
 import com.kzaemrio.anread.model.ItemPosition;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -62,41 +61,13 @@ public class ItemListViewModel extends AndroidViewModel {
     public void updateItemList() {
         Actions.executeOnDiskIO(() -> {
             mIsShowLoading.postValue(true);
-            loadOnLine(loadCache());
+            requestData();
             mIsShowLoading.postValue(false);
         });
     }
 
-    private List<ItemListAdapter.ViewItem> loadCache() {
-        List<ItemListAdapter.ViewItem> list = AppDatabaseHolder.of(getApplication())
-                .itemDao()
-                .queryBy(mChannelList.toArray(new String[0]))
-                .stream()
-                .map(ItemListAdapter.ViewItem::create)
-                .collect(Collectors.toList());
-
-        mItemList.postValue(list);
-
-        ItemPosition itemPosition = AppDatabaseHolder.of(getApplication()).itemPositionDao().query(mChannelList.toString());
-        if (itemPosition != null) {
-            for (int i = 0; i < list.size(); i++) {
-                ItemListAdapter.ViewItem item = list.get(i);
-
-                if (item.getItem().mLink.equals(itemPosition.mItemId)) {
-                    mItemPosition.postValue(AdapterItemPosition.create(
-                            i,
-                            itemPosition.mOffset
-                    ));
-                    break;
-                }
-            }
-        }
-
-        return list;
-    }
-
-    private void loadOnLine(List<ItemListAdapter.ViewItem> cacheList) {
-        List<ItemListAdapter.ViewItem> newList = mChannelList.stream()
+    private void requestData() {
+        List<ItemListAdapter.ViewItem> list = mChannelList.stream()
                 .map(url -> {
                     try {
                         return Actions.getItemArray(url);
@@ -106,32 +77,42 @@ public class ItemListViewModel extends AndroidViewModel {
                     }
                 })
                 .flatMap(Stream::of)
-                .filter(item -> item.mPubDate > (cacheList.size() > 0 ? cacheList.get(0).getItem().mPubDate : 0))
                 .sorted(Comparator.<Item, Long>comparing(i -> i.mPubDate).reversed())
                 .map(ItemListAdapter.ViewItem::create)
                 .collect(Collectors.toList());
 
-        ArrayList<ItemListAdapter.ViewItem> result = new ArrayList<>(newList.size() + cacheList.size());
-        result.addAll(newList);
-        result.addAll(cacheList);
-        mItemList.postValue(result);
+        mItemList.postValue(list);
 
-        if (newList.size() > 0) {
-            mHasNew.postValue(newList.size());
-            AppDatabaseHolder.of(getApplication()).itemDao().insert(
-                    newList.stream().map(ItemListAdapter.ViewItem::getItem).toArray(Item[]::new)
-            );
+        ItemPosition itemPosition = AppDatabaseHolder.of(getApplication()).itemPositionDao().query(mChannelList.toString());
+        if (itemPosition != null) {
+            int index = Actions.binarySearch(list, itemPosition.mPubDate, it -> it.getItem().mPubDate);
+            if (index > 0) {
+                mItemPosition.postValue(AdapterItemPosition.create(
+                        index,
+                        itemPosition.mOffset
+                ));
+            }
         }
+
+        AppDatabaseHolder.of(getApplication()).itemDao().insert(
+                list.stream().map(ItemListAdapter.ViewItem::getItem).toArray(Item[]::new)
+        );
     }
 
     public void saveItemPosition(int adapterPosition, int offset) {
         String groupId = mChannelList.toString();
-        String itemId = Objects.requireNonNull(mItemList.getValue()).get(adapterPosition).getItem().mLink;
+        long pubDate = Objects.requireNonNull(mItemList.getValue()).get(adapterPosition).getItem().mPubDate;
 
         Actions.executeOnDiskIO(() -> {
             AppDatabaseHolder.of(getApplication())
                     .itemPositionDao()
-                    .insert(ItemPosition.create(groupId, itemId, offset));
+                    .insert(ItemPosition.create(groupId, pubDate, offset));
+        });
+    }
+
+    public void clearItem() {
+        Actions.executeOnDiskIO(() -> {
+            AppDatabaseHolder.of(getApplication()).itemDao().clear();
         });
     }
 
