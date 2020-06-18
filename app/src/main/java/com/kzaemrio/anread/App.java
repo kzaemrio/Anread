@@ -8,6 +8,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Actions.executeOnDiskIO(() -> AndroidThreeTen.init(this));
+        Actions.executeOnBackground(() -> AndroidThreeTen.init(this));
     }
 }

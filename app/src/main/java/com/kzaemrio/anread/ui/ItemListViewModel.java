@@ -59,7 +59,7 @@ public class ItemListViewModel extends AndroidViewModel {
     }
 
     public void updateItemList() {
-        Actions.executeOnDiskIO(() -> {
+        Actions.executeOnBackground(() -> {
             mIsShowLoading.postValue(true);
             requestData();
             mIsShowLoading.postValue(false);
@@ -111,7 +111,7 @@ public class ItemListViewModel extends AndroidViewModel {
         String groupId = mChannelList.toString();
         long pubDate = Objects.requireNonNull(mItemList.getValue()).get(adapterPosition).getItem().mPubDate;
 
-        Actions.executeOnDiskIO(() -> {
+        Actions.executeOnBackground(() -> {
             AppDatabaseHolder.of(getApplication())
                     .itemPositionDao()
                     .insert(ItemPosition.create(groupId, pubDate, offset));
@@ -119,7 +119,7 @@ public class ItemListViewModel extends AndroidViewModel {
     }
 
     public void clearItem() {
-        Actions.executeOnDiskIO(() -> AppDatabaseHolder.of(getApplication()).itemDao().clear());
+        Actions.executeOnBackground(() -> AppDatabaseHolder.of(getApplication()).itemDao().clear());
     }
 
     public interface AdapterItemPosition {

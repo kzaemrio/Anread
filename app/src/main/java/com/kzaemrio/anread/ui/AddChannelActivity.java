@@ -29,7 +29,7 @@ public class AddChannelActivity extends BaseActivity {
         view.setCallback(() -> {
             view.showLoading(true);
             String input = view.getInput().toString();
-            Actions.executeOnDiskIO(() -> {
+            Actions.executeOnBackground(() -> {
                 try {
                     Channel channel = Actions.getChannel(input);
                     AppDatabaseHolder.of(getApplication()).channelDao().insert(channel);

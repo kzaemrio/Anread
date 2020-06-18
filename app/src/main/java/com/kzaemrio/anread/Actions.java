@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
 
+import okhttp3.Dispatcher;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -28,13 +29,15 @@ public interface Actions {
 
     ExecutorService pool = Executors.newFixedThreadPool(1);
 
-    static void executeOnDiskIO(Runnable runnable) {
+    OkHttpClient client = new OkHttpClient.Builder().dispatcher(new Dispatcher(pool)).build();
+
+    static void executeOnBackground(Runnable runnable) {
         pool.execute(runnable);
     }
 
     static Item[] getItemArray(String url) throws Exception {
         Request request = new Request.Builder().url(url).build();
-        Response response = new OkHttpClient.Builder().build().newCall(request).execute();
+        Response response = client.newCall(request).execute();
         Feed feed = new Persister().read(Feed.class, Objects.requireNonNull(response.body()).byteStream(), false);
         Channel channel = Channel.create(url, feed.mFeedChannel.mTitle);
         return feed.mFeedChannel.mFeedItemList.stream()
