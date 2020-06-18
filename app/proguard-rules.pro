@@ -20,7 +20,8 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keepclassmembers class com.kzaemrio.anread.model.Feed** { <init>(); }
 
 #noinspection ShrinkerUnresolvedReference
 -keepclassmembers class org.simpleframework.xml.** { *; }
+
+-keepclassmembers @org.simpleframework.xml.Root class * { <init>(); }
