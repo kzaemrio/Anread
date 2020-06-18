@@ -16,20 +16,20 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.function.Function;
 
-import androidx.arch.core.executor.ArchTaskExecutor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public interface Actions {
-    static void executeOnDiskIO(Runnable runnable) {
-        ArchTaskExecutor.getInstance().executeOnDiskIO(runnable);
-    }
 
-    static void executeOnMainThread(Runnable runnable) {
-        ArchTaskExecutor.getInstance().executeOnMainThread(runnable);
+    ExecutorService pool = Executors.newFixedThreadPool(1);
+
+    static void executeOnDiskIO(Runnable runnable) {
+        pool.execute(runnable);
     }
 
     static Item[] getItemArray(String url) throws Exception {
