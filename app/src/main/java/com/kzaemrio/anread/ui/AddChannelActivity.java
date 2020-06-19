@@ -14,6 +14,8 @@ import com.kzaemrio.anread.databinding.ActivityAddChannelBinding;
 import com.kzaemrio.anread.model.AppDatabaseHolder;
 import com.kzaemrio.anread.model.Channel;
 
+import java.io.IOException;
+
 import androidx.annotation.Nullable;
 
 public class AddChannelActivity extends BaseActivity {
@@ -34,7 +36,7 @@ public class AddChannelActivity extends BaseActivity {
                     Channel channel = Actions.getChannel(input);
                     AppDatabaseHolder.of(getApplication()).channelDao().insert(channel);
                     finish();
-                } catch (Exception e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             });

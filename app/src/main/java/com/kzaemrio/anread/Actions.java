@@ -11,6 +11,7 @@ import com.kzaemrio.anread.xml.XMLLexer;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.Token;
+import org.jetbrains.annotations.NotNull;
 import org.simpleframework.xml.core.Persister;
 
 import java.io.IOException;
@@ -41,9 +42,7 @@ public interface Actions {
     }
 
     static Item[] getItemArray(String url) throws Exception {
-        Request request = new Request.Builder().url(url).build();
-        Response response = client.newCall(request).execute();
-        InputStream inputStream = Objects.requireNonNull(response.body()).byteStream();
+        InputStream inputStream = getNetworkInputStream(url);
         Feed feed = new Persister().read(Feed.class, inputStream, false);
         Channel channel = Channel.create(url, feed.mFeedChannel.mTitle);
         return feed.mFeedChannel.mFeedItemList.stream()
@@ -52,9 +51,7 @@ public interface Actions {
     }
 
     static Channel getChannel(String url) throws IOException {
-        Request request = new Request.Builder().url(url).build();
-        Response response = client.newCall(request).execute();
-        InputStream inputStream = Objects.requireNonNull(response.body()).byteStream();
+        InputStream inputStream = getNetworkInputStream(url);
         XMLLexer xmlLexer = new XMLLexer(CharStreams.fromStream(inputStream));
 
         boolean[] is = {false};
@@ -71,6 +68,13 @@ public interface Actions {
         }
 
         throw new IllegalArgumentException("error rss url: " + url);
+    }
+
+    @NotNull
+    static InputStream getNetworkInputStream(String url) throws IOException {
+        Request request = new Request.Builder().url(url).build();
+        Response response = client.newCall(request).execute();
+        return Objects.requireNonNull(response.body()).byteStream();
     }
 
     static <T, V extends Comparable<? super V>> int binarySearch(List<T> list, V key, Function<T, V> mapper) {
