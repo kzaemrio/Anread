@@ -44,7 +44,10 @@ public class ItemListFragment extends Fragment {
             public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
                 if (Lifecycle.Event.ON_PAUSE == event) {
                     if (!isRemoving()) {
-                        mModel.saveItemPosition(mView.getAdapterPosition(), mView.getOffset());
+                        int adapterPosition = mView.getAdapterPosition();
+                        if (adapterPosition >= 0) {
+                            mModel.saveItemPosition(adapterPosition, mView.getOffset());
+                        }
                     }
                 }
             }
@@ -88,7 +91,7 @@ public class ItemListFragment extends Fragment {
         mModel.getIsShowLoading().observe(getViewLifecycleOwner(), mView::showLoading);
         mModel.getItemList().observe(getViewLifecycleOwner(), mView::bind);
         mModel.getItemPosition().observe(getViewLifecycleOwner(), mView::scrollTo);
-        mModel.getNewCount().observe(getViewLifecycleOwner(),mView::setNewCount);
+        mModel.getNewCount().observe(getViewLifecycleOwner(), mView::setNewCount);
 
         mModel.updateItemList();
     }
