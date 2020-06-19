@@ -1,5 +1,9 @@
 package com.kzaemrio.anread;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import com.kzaemrio.anread.model.Channel;
 import com.kzaemrio.anread.model.Feed;
 import com.kzaemrio.anread.model.Item;
@@ -16,6 +20,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Function;
@@ -83,5 +88,13 @@ public interface Actions {
                 return list.size();
             }
         };
+    }
+
+    static boolean isOnline(Context context) {
+        return Optional.ofNullable(context.getSystemService(Context.CONNECTIVITY_SERVICE))
+                .map(ConnectivityManager.class::cast)
+                .map(ConnectivityManager::getActiveNetworkInfo)
+                .map(NetworkInfo::isConnected)
+                .orElse(false);
     }
 }

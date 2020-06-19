@@ -78,7 +78,6 @@ public class ItemListFragment extends Fragment {
         mView.setCallback(new ItemListView.Callback() {
             @Override
             public void onRefresh() {
-                mModel.saveItemPosition(mView.getAdapterPosition(), mView.getOffset());
                 mModel.updateItemList();
             }
 
