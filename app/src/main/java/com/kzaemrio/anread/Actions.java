@@ -43,7 +43,8 @@ public interface Actions {
     static Item[] getItemArray(String url) throws Exception {
         Request request = new Request.Builder().url(url).build();
         Response response = client.newCall(request).execute();
-        Feed feed = new Persister().read(Feed.class, Objects.requireNonNull(response.body()).byteStream(), false);
+        InputStream inputStream = Objects.requireNonNull(response.body()).byteStream();
+        Feed feed = new Persister().read(Feed.class, inputStream, false);
         Channel channel = Channel.create(url, feed.mFeedChannel.mTitle);
         return feed.mFeedChannel.mFeedItemList.stream()
                 .map(feedItem -> Item.create(feedItem, channel.getTitle(), url))
@@ -52,7 +53,7 @@ public interface Actions {
 
     static Channel getChannel(String url) throws IOException {
         Request request = new Request.Builder().url(url).build();
-        Response response = new OkHttpClient.Builder().build().newCall(request).execute();
+        Response response = client.newCall(request).execute();
         InputStream inputStream = Objects.requireNonNull(response.body()).byteStream();
         XMLLexer xmlLexer = new XMLLexer(CharStreams.fromStream(inputStream));
 
