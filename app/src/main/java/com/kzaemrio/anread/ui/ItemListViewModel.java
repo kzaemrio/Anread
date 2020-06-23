@@ -77,6 +77,7 @@ public class ItemListViewModel extends AndroidViewModel {
                     }
                 })
                 .flatMap(Stream::of)
+                .filter(item -> !item.mTitle.contains("之家"))
                 .sorted(Comparator.<Item, Long>comparing(i -> i.mPubDate).reversed())
                 .map(ItemListAdapter.ViewItem::create)
                 .collect(Collectors.toList());
