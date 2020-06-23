@@ -22,6 +22,3 @@
 
 
 #noinspection ShrinkerUnresolvedReference
--keepclassmembers class org.simpleframework.xml.** { *; }
-
--keepclassmembers @org.simpleframework.xml.Root class * { <init>(); }

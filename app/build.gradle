@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    buildToolsVersion "30.0.0"
     defaultConfig {
         applicationId "com.kzaemrio.anread"
         minSdkVersion 24
@@ -53,7 +53,7 @@ dependencies {
 
     implementation "androidx.activity:activity:1.1.0"
 
-    def fragment_version = "1.2.4"
+    def fragment_version = "1.2.5"
     implementation "androidx.fragment:fragment:$fragment_version"
 
     def lifecycle_version = "2.2.0"
@@ -76,10 +76,6 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.7.2'
 
     implementation 'com.jakewharton.threetenabp:threetenabp:1.2.4'
-
-    implementation("org.simpleframework:simple-xml:2.7.1") {
-        exclude module: 'xpp3'
-    }
 
     implementation 'org.antlr:antlr4-runtime:4.8'
 }
