@@ -1,2 +1,3 @@
 # Anread
-A rss reader
+
+Android reader for ithome
