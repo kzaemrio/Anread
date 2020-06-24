@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -55,7 +56,8 @@ public class MainView {
         mContext = context;
 
         mAdapter = new ItemListAdapter();
-        mAdapter.setItemConsumer(this::showDetail);
+        mAdapter.setOnItemClickAction(this::showDetail);
+        mAdapter.setOnItemLongClickAction(this::shareItem);
 
         mLayoutManager = new LinearLayoutManager(mContext);
         mLayoutManager.setStackFromEnd(true);
@@ -83,6 +85,17 @@ public class MainView {
         mFrameLayout = new FrameLayout(mContext);
         mFrameLayout.addView(mRefreshLayout);
         mFrameLayout.addView(mWebViewBox);
+    }
+
+    private void shareItem(Item item) {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        String value = item.getTitle() + "\n---\n" + item.getLink();
+        sendIntent.putExtra(Intent.EXTRA_TEXT, value);
+        sendIntent.setType("text/plain");
+        if (sendIntent.resolveActivity(mContext.getPackageManager()) != null) {
+            mContext.startActivity(Intent.createChooser(sendIntent, mContext.getString(R.string.action_share)));
+        }
     }
 
     public View getContentView() {

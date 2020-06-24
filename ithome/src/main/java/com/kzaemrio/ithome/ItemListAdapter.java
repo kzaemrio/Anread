@@ -25,7 +25,10 @@ import java.util.Objects;
 
 public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemListAdapter.Holder> {
 
-    private Consumer<Item> mItemConsumer = s -> {
+    private Consumer<Item> mOnItemClickAction = s -> {
+    };
+
+    private Consumer<Item> mOnItemLongClickAction = s -> {
     };
 
     public ItemListAdapter() {
@@ -42,8 +45,12 @@ public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemL
         });
     }
 
-    public void setItemConsumer(Consumer<Item> itemConsumer) {
-        mItemConsumer = itemConsumer;
+    public void setOnItemClickAction(Consumer<Item> onItemClickAction) {
+        mOnItemClickAction = onItemClickAction;
+    }
+
+    public void setOnItemLongClickAction(Consumer<Item> onItemLongClickAction) {
+        mOnItemLongClickAction = onItemLongClickAction;
     }
 
     @NonNull
@@ -56,7 +63,11 @@ public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemL
     public void onBindViewHolder(@NonNull Holder holder, int position) {
         ViewItem viewItem = getItem(position);
         holder.bind(viewItem);
-        holder.itemView.setOnClickListener(v -> mItemConsumer.accept(viewItem.mItem));
+        holder.itemView.setOnClickListener(v -> mOnItemClickAction.accept(viewItem.mItem));
+        holder.itemView.setOnLongClickListener(v -> {
+            mOnItemLongClickAction.accept(viewItem.mItem);
+            return true;
+        });
     }
 
     public static class Holder extends RecyclerView.ViewHolder {
