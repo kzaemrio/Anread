@@ -4,6 +4,18 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import com.kzaemrio.ithome.event.OnHasNewEvent;
+import com.kzaemrio.ithome.event.OnHideWebViewLoadingEvent;
+import com.kzaemrio.ithome.event.OnItemListEvent;
+import com.kzaemrio.ithome.event.OnRefreshHideEvent;
+import com.kzaemrio.ithome.event.OnRefreshShowEvent;
+import com.kzaemrio.ithome.event.OnScrollToPositionWithOffsetEvent;
+import com.kzaemrio.ithome.event.OnShowWebViewLoadingEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,11 +39,23 @@ public class MainActivity extends Activity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
     protected void onPause() {
         super.onPause();
         if (mView.isInit()) {
             mPreferences.save(mView.getPubDate(), mView.getOffset());
         }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -45,39 +69,45 @@ public class MainActivity extends Activity {
     }
 
     private void requestData() {
-        Actions.executeOnBackground(() -> {
-            runOnUiThread(mView::showRefresh);
+        boolean init = mView.isInit();
+        int offset = mPreferences.getOffset();
+        long pubDate = mPreferences.getPubDate();
+        Actions.executeOnBackground(RequestFactory.create(init, offset, pubDate));
+    }
 
-            List<ItemListAdapter.ViewItem> list = Actions.requestItemList().stream()
-                    .filter(item -> !item.getTitle().contains("IT之家"))
-                    .sorted(Comparator.comparing(Item::getPubDate).reversed())
-                    .map(ItemListAdapter.ViewItem::create)
-                    .collect(Collectors.toList());
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(OnRefreshShowEvent event) {
+        mView.showRefresh();
+    }
 
-            int offset;
-            int index;
-            if (!mView.isInit()) {
-                long pubDate = mPreferences.getPubDate();
-                offset = mPreferences.getOffset();
-                index = Actions.binarySearch(list, pubDate, it -> it.getItem().getPubDate());
-            } else {
-                index = -1;
-                offset = 0;
-            }
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(OnRefreshHideEvent event) {
+        mView.hideRefresh();
+    }
 
-            runOnUiThread(() -> {
-                mView.bind(list);
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(OnItemListEvent event) {
+        mView.bind(event.getList());
+    }
 
-                if (index >= 0) {
-                    mView.scrollToPositionWithOffset(index, offset);
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(OnScrollToPositionWithOffsetEvent event) {
+        mView.scrollToPositionWithOffset(event.getIndex(), event.getOffset());
+    }
 
-                    if (index > 0) {
-                        mView.alertHasNew();
-                    }
-                }
-                mView.hideRefresh();
-            });
-        });
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onEvent(OnHasNewEvent event) {
+        mView.alertHasNew();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void OnEvent(OnShowWebViewLoadingEvent event) {
+        mView.showWebViewLoading();
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void OnEvent(OnHideWebViewLoadingEvent event) {
+        mView.hideWebViewLoading();
     }
 
     public static class PreferencesWrapper {
@@ -104,6 +134,40 @@ public class MainActivity extends Activity {
 
         public int getOffset() {
             return mPreferences.getInt(KEY_OFFSET, 0);
+        }
+    }
+
+    private static class RequestFactory {
+        public static Runnable create(boolean init, int offset, long pubDate) {
+            return () -> {
+                EventBus bus = EventBus.getDefault();
+
+                bus.post(new OnRefreshShowEvent());
+
+                List<ItemListAdapter.ViewItem> list = Actions.requestItemList().stream()
+                        .filter(item -> !item.getTitle().contains("IT之家"))
+                        .sorted(Comparator.comparing(Item::getPubDate).reversed())
+                        .map(ItemListAdapter.ViewItem::create)
+                        .collect(Collectors.toList());
+
+                int index;
+                if (!init) {
+                    index = Actions.binarySearch(list, pubDate, it -> it.getItem().getPubDate());
+                } else {
+                    index = -1;
+                }
+
+                bus.post(new OnItemListEvent(list));
+
+                if (index >= 0) {
+                    bus.post(new OnScrollToPositionWithOffsetEvent(index, offset));
+
+                    if (index > 0) {
+                        bus.post(new OnHasNewEvent());
+                    }
+                }
+                bus.post(new OnRefreshHideEvent());
+            };
         }
     }
 }

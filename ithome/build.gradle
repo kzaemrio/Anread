@@ -10,6 +10,12 @@ android {
         versionCode 1
         versionName "1.0.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [ eventBusIndex : 'com.kzaemrio.ithome.EventBusIndex' ]
+            }
+        }
     }
     buildTypes {
         release {
@@ -55,4 +61,8 @@ dependencies {
     implementation 'com.jakewharton.threetenabp:threetenabp:1.2.4'
 
     implementation 'org.antlr:antlr4-runtime:4.8'
+
+    def eventbus_version = '3.2.0'
+    implementation "org.greenrobot:eventbus:$eventbus_version"
+    annotationProcessor "org.greenrobot:eventbus-annotation-processor:$eventbus_version"
 }

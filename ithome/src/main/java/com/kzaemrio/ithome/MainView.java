@@ -19,6 +19,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.kzaemrio.ithome.event.OnHideWebViewLoadingEvent;
+import com.kzaemrio.ithome.event.OnShowWebViewLoadingEvent;
+
+import org.greenrobot.eventbus.EventBus;
 import org.threeten.bp.Instant;
 import org.threeten.bp.ZoneId;
 import org.threeten.bp.ZonedDateTime;
@@ -40,6 +44,7 @@ public class MainView {
 
     private final SwipeRefreshLayout mRefreshLayout;
 
+    private final ProgressBar mProgressBar;
     private final FrameLayout mWebViewBox;
 
     private final FrameLayout mFrameLayout;
@@ -52,30 +57,30 @@ public class MainView {
         mAdapter = new ItemListAdapter();
         mAdapter.setItemConsumer(this::showDetail);
 
-        mLayoutManager = new LinearLayoutManager(context);
+        mLayoutManager = new LinearLayoutManager(mContext);
         mLayoutManager.setStackFromEnd(true);
 
-        mRecyclerView = new RecyclerView(context);
+        mRecyclerView = new RecyclerView(mContext);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        mRefreshLayout = new SwipeRefreshLayout(context);
+        mRefreshLayout = new SwipeRefreshLayout(mContext);
         mRefreshLayout.addView(mRecyclerView);
 
-        ProgressBar progressBar = new ProgressBar(context);
-        progressBar.setIndeterminateTintList(ColorStateList.valueOf(mContext.getColor(R.color.colorAccent)));
+        mProgressBar = new ProgressBar(mContext);
+        mProgressBar.setIndeterminateTintList(ColorStateList.valueOf(mContext.getColor(R.color.colorAccent)));
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(100, 100, Gravity.CENTER);
 
-        mWebView = new WebView(context.getApplicationContext());
+        mWebView = new WebView(mContext.getApplicationContext());
         mWebView.setWebViewClient(new MyWebViewClient());
 
-        mWebViewBox = new FrameLayout(context);
+        mWebViewBox = new FrameLayout(mContext);
         mWebViewBox.setBackgroundColor(Color.WHITE);
-        mWebViewBox.addView(progressBar, params);
+        mWebViewBox.addView(mProgressBar, params);
         mWebViewBox.addView(mWebView);
         mWebViewBox.setVisibility(View.GONE);
 
-        mFrameLayout = new FrameLayout(context);
+        mFrameLayout = new FrameLayout(mContext);
         mFrameLayout.addView(mRefreshLayout);
         mFrameLayout.addView(mWebViewBox);
     }
@@ -195,6 +200,14 @@ public class MainView {
         mRecyclerView.postDelayed(() -> mRecyclerView.smoothScrollBy(0, -50), 300);
     }
 
+    public void showWebViewLoading() {
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    public void hideWebViewLoading() {
+        mProgressBar.setVisibility(View.GONE);
+    }
+
     public interface Callback {
         void onRefresh();
     }
@@ -204,12 +217,14 @@ public class MainView {
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
             view.setVisibility(View.GONE);
+            EventBus.getDefault().post(new OnShowWebViewLoadingEvent());
         }
 
         @Override
         public void onPageCommitVisible(WebView view, String url) {
             super.onPageCommitVisible(view, url);
             view.setVisibility(View.VISIBLE);
+            EventBus.getDefault().post(new OnHideWebViewLoadingEvent());
         }
     }
 }
