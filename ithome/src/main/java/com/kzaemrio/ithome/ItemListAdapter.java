@@ -93,7 +93,7 @@ public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemL
 
         public void bind(ViewItem viewItem) {
             title.setText(viewItem.mTitle);
-            time.setText(String.format("%s\t%s", viewItem.mTime, viewItem.mLabel));
+            time.setText(viewItem.mTime + "   " + viewItem.mLabel);
             content.setText(viewItem.mContent);
         }
     }
