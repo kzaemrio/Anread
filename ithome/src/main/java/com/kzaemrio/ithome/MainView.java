@@ -22,8 +22,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.kzaemrio.ithome.event.OnHideWebViewLoadingEvent;
 import com.kzaemrio.ithome.event.OnShowWebViewLoadingEvent;
+import com.kzaemrio.simplebus.lib.SimpleBus;
 
-import org.greenrobot.eventbus.EventBus;
 import org.threeten.bp.Instant;
 import org.threeten.bp.ZoneId;
 import org.threeten.bp.ZonedDateTime;
@@ -179,7 +179,6 @@ public class MainView {
 
         mWebView.onPause();
         mWebView.removeAllViews();
-        mWebView.destroyDrawingCache();
 
         // NOTE: This pauses JavaScript execution for ALL WebViews,
         // do not use if you have other WebViews still alive.
@@ -230,14 +229,14 @@ public class MainView {
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
             view.setVisibility(View.GONE);
-            EventBus.getDefault().post(new OnShowWebViewLoadingEvent());
+            SimpleBus.getDefault().post(new OnShowWebViewLoadingEvent());
         }
 
         @Override
         public void onPageCommitVisible(WebView view, String url) {
             super.onPageCommitVisible(view, url);
             view.setVisibility(View.VISIBLE);
-            EventBus.getDefault().post(new OnHideWebViewLoadingEvent());
+            SimpleBus.getDefault().post(new OnHideWebViewLoadingEvent());
         }
     }
 }

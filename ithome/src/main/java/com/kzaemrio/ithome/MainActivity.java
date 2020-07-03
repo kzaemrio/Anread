@@ -11,10 +11,9 @@ import com.kzaemrio.ithome.event.OnRefreshHideEvent;
 import com.kzaemrio.ithome.event.OnRefreshShowEvent;
 import com.kzaemrio.ithome.event.OnScrollToPositionWithOffsetEvent;
 import com.kzaemrio.ithome.event.OnShowWebViewLoadingEvent;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
-import org.greenrobot.eventbus.ThreadMode;
+import com.kzaemrio.simplebus.lib.Bus;
+import com.kzaemrio.simplebus.lib.SimpleBus;
+import com.kzaemrio.simplebus.lib.Subscribe;
 
 import java.util.Comparator;
 import java.util.List;
@@ -41,7 +40,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        SimpleBus.getDefault().register(this);
     }
 
     @Override
@@ -55,7 +54,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-        EventBus.getDefault().unregister(this);
+        SimpleBus.getDefault().unregister(this);
     }
 
     @Override
@@ -75,37 +74,37 @@ public class MainActivity extends Activity {
         Actions.executeOnBackground(RequestFactory.create(init, offset, pubDate));
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe
     public void onEvent(OnRefreshShowEvent event) {
         mView.showRefresh();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe
     public void onEvent(OnRefreshHideEvent event) {
         mView.hideRefresh();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe
     public void onEvent(OnItemListEvent event) {
         mView.bind(event.getList());
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe
     public void onEvent(OnScrollToPositionWithOffsetEvent event) {
         mView.scrollToPositionWithOffset(event.getIndex(), event.getOffset());
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe
     public void onEvent(OnHasNewEvent event) {
         mView.alertHasNew();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe
     public void OnEvent(OnShowWebViewLoadingEvent event) {
         mView.showWebViewLoading();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+    @Subscribe
     public void OnEvent(OnHideWebViewLoadingEvent event) {
         mView.hideWebViewLoading();
     }
@@ -140,7 +139,7 @@ public class MainActivity extends Activity {
     private static class RequestFactory {
         public static Runnable create(boolean init, int offset, long pubDate) {
             return () -> {
-                EventBus bus = EventBus.getDefault();
+                Bus bus = SimpleBus.getDefault();
 
                 bus.post(new OnRefreshShowEvent());
 
