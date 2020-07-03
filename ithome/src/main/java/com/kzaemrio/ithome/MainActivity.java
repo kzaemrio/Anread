@@ -11,6 +11,8 @@ import com.kzaemrio.ithome.event.OnRefreshHideEvent;
 import com.kzaemrio.ithome.event.OnRefreshShowEvent;
 import com.kzaemrio.ithome.event.OnScrollToPositionWithOffsetEvent;
 import com.kzaemrio.ithome.event.OnShowWebViewLoadingEvent;
+import com.kzaemrio.ithome.event.OnWebViewHideStartEvent;
+import com.kzaemrio.ithome.event.OnWebViewShowEndEvent;
 import com.kzaemrio.simplebus.lib.Bus;
 import com.kzaemrio.simplebus.lib.SimpleBus;
 import com.kzaemrio.simplebus.lib.Subscribe;
@@ -107,6 +109,16 @@ public class MainActivity extends Activity {
     @Subscribe
     public void OnEvent(OnHideWebViewLoadingEvent event) {
         mView.hideWebViewLoading();
+    }
+
+    @Subscribe
+    public void onEvent(OnWebViewShowEndEvent event) {
+        mView.hideList();
+    }
+
+    @Subscribe
+    public void onEvent(OnWebViewHideStartEvent event) {
+        mView.showList();
     }
 
     public static class PreferencesWrapper {

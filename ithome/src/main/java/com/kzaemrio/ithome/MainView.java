@@ -22,6 +22,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.kzaemrio.ithome.event.OnHideWebViewLoadingEvent;
 import com.kzaemrio.ithome.event.OnShowWebViewLoadingEvent;
+import com.kzaemrio.ithome.event.OnWebViewHideStartEvent;
+import com.kzaemrio.ithome.event.OnWebViewShowEndEvent;
 import com.kzaemrio.simplebus.lib.SimpleBus;
 
 import org.threeten.bp.Instant;
@@ -146,6 +148,12 @@ public class MainView {
                 super.onAnimationStart(animation);
                 mWebViewBox.setVisibility(View.VISIBLE);
             }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+                SimpleBus.getDefault().post(new OnWebViewShowEndEvent());
+            }
         });
         animator.setDuration(duration);
         animator.start();
@@ -154,6 +162,12 @@ public class MainView {
     public void hideWebView() {
         ObjectAnimator animator = ObjectAnimator.ofFloat(mWebViewBox, View.TRANSLATION_Y, 0, mFrameLayout.getHeight());
         animator.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationStart(animation);
+                SimpleBus.getDefault().post(new OnWebViewHideStartEvent());
+            }
+
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
@@ -218,6 +232,14 @@ public class MainView {
 
     public void hideWebViewLoading() {
         mProgressBar.setVisibility(View.GONE);
+    }
+
+    public void hideList() {
+        mRefreshLayout.setVisibility(View.GONE);
+    }
+
+    public void showList() {
+        mRefreshLayout.setVisibility(View.VISIBLE);
     }
 
     public interface Callback {

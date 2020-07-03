@@ -74,14 +74,12 @@ public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemL
 
         private final TextView title;
         private final TextView time;
-        private final TextView label;
         private final TextView content;
 
         public Holder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.title);
             time = itemView.findViewById(R.id.time);
-            label = itemView.findViewById(R.id.label);
             content = itemView.findViewById(R.id.content);
         }
 
@@ -95,8 +93,7 @@ public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemL
 
         public void bind(ViewItem viewItem) {
             title.setText(viewItem.mTitle);
-            time.setText(viewItem.mTime);
-            label.setText(viewItem.mLabel);
+            time.setText(String.format("%s\t%s", viewItem.mTime, viewItem.mLabel));
             content.setText(viewItem.mContent);
         }
     }

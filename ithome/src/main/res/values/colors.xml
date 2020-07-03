@@ -10,4 +10,6 @@
     <color name="text_color_time">#aaa</color>
     <color name="text_color_label">#bbb</color>
     <color name="divider">#ddd</color>
+
+    <color name="transparent">@android:color/transparent</color>
 </resources>
