@@ -11,5 +11,5 @@
     <color name="text_color_label">#bbb</color>
     <color name="divider">#ddd</color>
 
-    <color name="transparent">@android:color/transparent</color>
+    <color name="white">#fff</color>
 </resources>
