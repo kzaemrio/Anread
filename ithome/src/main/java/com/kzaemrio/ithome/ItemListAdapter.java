@@ -3,7 +3,6 @@ package com.kzaemrio.ithome;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.util.Consumer;
@@ -11,6 +10,7 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.kzaemrio.ithome.databinding.BinderContentBinding;
 import com.kzaemrio.ithome.xml.XMLLexer;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -72,15 +72,11 @@ public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemL
 
     public static class Holder extends RecyclerView.ViewHolder {
 
-        private final TextView title;
-        private final TextView time;
-        private final TextView content;
+        private final BinderContentBinding mBind;
 
         public Holder(@NonNull View itemView) {
             super(itemView);
-            title = itemView.findViewById(R.id.title);
-            time = itemView.findViewById(R.id.time);
-            content = itemView.findViewById(R.id.content);
+            mBind = BinderContentBinding.bind(itemView);
         }
 
         public static Holder create(ViewGroup parent) {
@@ -92,9 +88,9 @@ public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemL
         }
 
         public void bind(ViewItem viewItem) {
-            title.setText(viewItem.mTitle);
-            time.setText(viewItem.mTime + "   " + viewItem.mLabel);
-            content.setText(viewItem.mContent);
+            mBind.title.setText(viewItem.mTitle);
+            mBind.time.setText(viewItem.mTime + "   " + viewItem.mLabel);
+            mBind.content.setText(viewItem.mContent);
         }
     }
 
