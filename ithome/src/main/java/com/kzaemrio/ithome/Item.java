@@ -88,6 +88,10 @@ public class Item {
             return this;
         }
 
+        public boolean isSkip() {
+            return mTitle.contains("IT之家");
+        }
+
         public Item build() {
             return new Item(this);
         }

@@ -16,7 +16,6 @@ import com.kzaemrio.simplebus.lib.Bus;
 import com.kzaemrio.simplebus.lib.SimpleBus;
 import com.kzaemrio.simplebus.lib.Subscribe;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -151,8 +150,6 @@ public class MainActivity extends Activity {
                 Bus bus = SimpleBus.getDefault();
 
                 List<ItemListAdapter.ViewItem> list = Actions.requestItemList().stream()
-                        .filter(item -> !item.getTitle().contains("IT之家"))
-                        .sorted(Comparator.comparing(Item::getPubDate).reversed())
                         .map(ItemListAdapter.ViewItem::create)
                         .collect(Collectors.toList());
 

@@ -143,7 +143,9 @@ public interface Actions {
             super.endElement(uri, localName, qName);
             switch (qName) {
                 case "item":
-                    mList.add(mBuilder.withChannelName(mChannelName).build());
+                    if (!mBuilder.isSkip()) {
+                        mList.add(mBuilder.withChannelName(mChannelName).build());
+                    }
                     item = false;
                     break;
                 case "title":
