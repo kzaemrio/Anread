@@ -8,7 +8,6 @@ import com.kzaemrio.ithome.event.OnHasNewEvent;
 import com.kzaemrio.ithome.event.OnHideWebViewLoadingEvent;
 import com.kzaemrio.ithome.event.OnItemListEvent;
 import com.kzaemrio.ithome.event.OnRefreshHideEvent;
-import com.kzaemrio.ithome.event.OnRefreshShowEvent;
 import com.kzaemrio.ithome.event.OnScrollToPositionWithOffsetEvent;
 import com.kzaemrio.ithome.event.OnShowWebViewLoadingEvent;
 import com.kzaemrio.ithome.event.OnWebViewHideStartEvent;
@@ -70,15 +69,13 @@ public class MainActivity extends Activity {
     }
 
     private void requestData() {
+        mView.showRefresh();
+
         boolean init = mView.isInit();
         int offset = mPreferences.getOffset();
         long pubDate = mPreferences.getPubDate();
-        Actions.executeOnBackground(RequestFactory.create(init, offset, pubDate));
-    }
 
-    @Subscribe
-    public void onEvent(OnRefreshShowEvent event) {
-        mView.showRefresh();
+        Actions.executeOnBackground(RequestFactory.create(init, offset, pubDate));
     }
 
     @Subscribe
@@ -152,8 +149,6 @@ public class MainActivity extends Activity {
         public static Runnable create(boolean init, int offset, long pubDate) {
             return () -> {
                 Bus bus = SimpleBus.getDefault();
-
-                bus.post(new OnRefreshShowEvent());
 
                 List<ItemListAdapter.ViewItem> list = Actions.requestItemList().stream()
                         .filter(item -> !item.getTitle().contains("IT之家"))
