@@ -2,6 +2,8 @@ package com.kzaemrio.ithome;
 
 import android.text.TextUtils;
 
+import com.kzaemrio.ithome.function.Function;
+
 import org.threeten.bp.ZoneId;
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
@@ -13,13 +15,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.AbstractList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.function.Function;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -62,7 +62,7 @@ public interface Actions {
 
 
     static <T, V extends Comparable<? super V>> int binarySearch(List<T> list, V key, Function<T, V> mapper) {
-        return Collections.binarySearch(mapList(list, mapper), key, Comparator.reverseOrder());
+        return Collections.binarySearch(mapList(list, mapper), key, (o1, o2) -> o2.compareTo(o1));
     }
 
     static <T, V> List<V> mapList(List<T> list, Function<T, V> mapper) {

@@ -16,8 +16,8 @@ import com.kzaemrio.simplebus.lib.Bus;
 import com.kzaemrio.simplebus.lib.SimpleBus;
 import com.kzaemrio.simplebus.lib.Subscribe;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MainActivity extends Activity {
 
@@ -149,9 +149,12 @@ public class MainActivity extends Activity {
             return () -> {
                 Bus bus = SimpleBus.getDefault();
 
-                List<ItemListAdapter.ViewItem> list = Actions.requestItemList().stream()
-                        .map(ItemListAdapter.ViewItem::create)
-                        .collect(Collectors.toList());
+                List<Item> itemList = Actions.requestItemList();
+                List<ItemListAdapter.ViewItem> list = new ArrayList<>(itemList.size());
+                for (Item item : itemList) {
+                    ItemListAdapter.ViewItem viewItem = ItemListAdapter.ViewItem.create(item);
+                    list.add(viewItem);
+                }
 
                 int index;
                 if (!init) {
