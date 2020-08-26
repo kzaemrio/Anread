@@ -1,3 +1,1 @@
 include ':ithome'
-include ':app'
-rootProject.name='Anread'
