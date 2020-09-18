@@ -77,7 +77,7 @@ public class MainView {
         dialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
             public void onShow(DialogInterface dialogInterface) {
-                WebView web = dialog.findViewById(R.id.web);
+                WebView web = Actions.cacheEnabledWeb(dialog.findViewById(R.id.web));
                 web.setWebViewClient(new WebViewClient() {
                     @Override
                     public void onPageFinished(WebView view, String url) {

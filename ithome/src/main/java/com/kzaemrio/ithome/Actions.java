@@ -3,6 +3,7 @@ package com.kzaemrio.ithome;
 import android.content.Context;
 import android.content.Intent;
 import android.text.TextUtils;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import androidx.core.content.ContextCompat;
@@ -98,6 +99,13 @@ public interface Actions {
         if (sendIntent.resolveActivity(context.getPackageManager()) != null) {
             context.startActivity(Intent.createChooser(sendIntent, context.getString(R.string.action_share)));
         }
+    }
+
+    static WebView cacheEnabledWeb(WebView webView) {
+        WebSettings settings = webView.getSettings();
+        settings.setAppCacheEnabled(true);
+        settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        return webView;
     }
 
     static void showDetail(WebView web, Item item) {

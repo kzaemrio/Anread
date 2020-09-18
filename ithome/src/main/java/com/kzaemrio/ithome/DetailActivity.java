@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -46,11 +45,7 @@ public class DetailActivity extends ComponentActivity {
     private void bind(Item item) {
         SwipeRefreshLayout refreshLayout = new SwipeRefreshLayout(this);
 
-        WebView webView = new WebView(getApplicationContext());
-
-        WebSettings settings = webView.getSettings();
-        settings.setAppCacheEnabled(true);
-        settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        WebView webView = Actions.cacheEnabledWeb(new WebView(getApplicationContext()));
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
