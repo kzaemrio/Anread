@@ -25,10 +25,10 @@ import java.util.Objects;
 
 public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemListAdapter.Holder> {
 
-    private Consumer<Item> mOnItemClickAction = s -> {
+    private Consumer<ItemListAdapter.ViewItem> mOnItemClickAction = s -> {
     };
 
-    private Consumer<Item> mOnItemLongClickAction = s -> {
+    private Consumer<ItemListAdapter.ViewItem> mOnItemLongClickAction = s -> {
     };
 
     public ItemListAdapter() {
@@ -45,11 +45,11 @@ public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemL
         });
     }
 
-    public void setOnItemClickAction(Consumer<Item> onItemClickAction) {
+    public void setOnItemClickAction(Consumer<ItemListAdapter.ViewItem> onItemClickAction) {
         mOnItemClickAction = onItemClickAction;
     }
 
-    public void setOnItemLongClickAction(Consumer<Item> onItemLongClickAction) {
+    public void setOnItemLongClickAction(Consumer<ItemListAdapter.ViewItem> onItemLongClickAction) {
         mOnItemLongClickAction = onItemLongClickAction;
     }
 
@@ -63,9 +63,9 @@ public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemL
     public void onBindViewHolder(@NonNull Holder holder, int position) {
         ViewItem viewItem = getItem(position);
         holder.bind(viewItem);
-        holder.itemView.setOnClickListener(v -> mOnItemClickAction.accept(viewItem.mItem));
+        holder.itemView.setOnClickListener(v -> mOnItemClickAction.accept(viewItem));
         holder.itemView.setOnLongClickListener(v -> {
-            mOnItemLongClickAction.accept(viewItem.mItem);
+            mOnItemLongClickAction.accept(viewItem);
             return true;
         });
     }

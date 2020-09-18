@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">anread</string>
     <string name="action_share">分享</string>
+    <string name="menu_cache">离线</string>
 </resources>

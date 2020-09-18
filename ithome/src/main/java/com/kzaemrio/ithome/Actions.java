@@ -1,9 +1,15 @@
 package com.kzaemrio.ithome;
 
+import android.content.Context;
+import android.content.Intent;
 import android.text.TextUtils;
+import android.webkit.WebView;
+
+import androidx.core.content.ContextCompat;
 
 import com.kzaemrio.ithome.function.Function;
 
+import org.threeten.bp.Instant;
 import org.threeten.bp.ZoneId;
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
@@ -21,6 +27,7 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -43,15 +50,18 @@ public interface Actions {
 
     static List<Item> requestItemList() {
         try {
-            InputStream inputStream = networkInputStream(url);
-            SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
-            ParseHandler parseHandler = new ParseHandler(url);
-            parser.parse(inputStream, parseHandler);
-            return parseHandler.getItemArray();
+            return streamToItemList(networkInputStream(url));
         } catch (Exception e) {
             e.printStackTrace();
             return Collections.emptyList();
         }
+    }
+
+    static List<Item> streamToItemList(InputStream inputStream) throws ParserConfigurationException, SAXException, IOException {
+        SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+        ParseHandler parseHandler = new ParseHandler(url);
+        parser.parse(inputStream, parseHandler);
+        return parseHandler.getItemArray();
     }
 
     static InputStream networkInputStream(String url) throws IOException {
@@ -77,6 +87,35 @@ public interface Actions {
                 return list.size();
             }
         };
+    }
+
+    static void shareItem(Context context, Item item) {
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        String value = item.getTitle() + "\n---\n" + item.getLink();
+        sendIntent.putExtra(Intent.EXTRA_TEXT, value);
+        sendIntent.setType("text/plain");
+        if (sendIntent.resolveActivity(context.getPackageManager()) != null) {
+            context.startActivity(Intent.createChooser(sendIntent, context.getString(R.string.action_share)));
+        }
+    }
+
+    static void showDetail(WebView web, Item item) {
+        String pubDate = ZonedDateTime.ofInstant(Instant.ofEpochMilli(item.getPubDate()), ZoneId.systemDefault()).format(DateTimeFormatter.ofPattern("MMM dd, yyyy 'at' HH:mm"));
+        String html = "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\" />" +
+                "<h3>" + item.getTitle() + "</h3>" +
+                "<p/>" +
+                String.format("<p style=\"color:#%06X\">", 0xFFFFFF & ContextCompat.getColor(web.getContext(), R.color.text_color_label)) + item.getChannelName() + "\t" + pubDate + "</p>" +
+                "<p/>" +
+                item.getDes();
+
+        web.loadDataWithBaseURL(
+                "file:///android_asset/",
+                html,
+                "text/html",
+                "UTF-8",
+                null
+        );
     }
 
     class ParseHandler extends DefaultHandler {

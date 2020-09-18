@@ -1,21 +1,38 @@
 package com.kzaemrio.ithome;
 
+import androidx.annotation.NonNull;
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity
 public class Item {
+    @ColumnInfo
     private final String mTitle;
+
+    @NonNull
+    @PrimaryKey
     private final String mLink;
+
+    @ColumnInfo
     private final String mDes;
+
+    @ColumnInfo
     private final long mPubDate;
 
+    @ColumnInfo
     private final String mChannelUrl;
+
+    @ColumnInfo
     private final String mChannelName;
 
-    private Item(Builder builder) {
-        mTitle = builder.mTitle;
-        mDes = builder.mDes;
-        mPubDate = builder.mPubDate;
-        mChannelName = builder.mChannelName;
-        mLink = builder.mLink;
-        mChannelUrl = builder.mChannelUrl;
+    public Item(String title, @NonNull String link, String des, long pubDate, String channelUrl, String channelName) {
+        mTitle = title;
+        mLink = link;
+        mDes = des;
+        mPubDate = pubDate;
+        mChannelUrl = channelUrl;
+        mChannelName = channelName;
     }
 
     public String getTitle() {
@@ -93,7 +110,14 @@ public class Item {
         }
 
         public Item build() {
-            return new Item(this);
+            return new Item(
+                    mTitle,
+                    mLink,
+                    mDes,
+                    mPubDate,
+                    mChannelUrl,
+                    mChannelName
+            );
         }
     }
 }
