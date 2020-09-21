@@ -18,7 +18,7 @@ public interface ItemDao {
     @Query("DELETE FROM Item WHERE mPubDate < :time")
     void cleanUp(long time);
 
-    @Query("SELECT * FROM item")
+    @Query("SELECT * FROM item ORDER BY mPubDate DESC")
     List<Item> getAll();
 
     @Query("SELECT * FROM item WHERE mLink = :link LIMIT 1")
