@@ -2,7 +2,6 @@ package com.kzaemrio.ithome;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.WebView;
@@ -11,11 +10,14 @@ import android.webkit.WebViewClient;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.kzaemrio.ithome.databinding.ActivityMainBinding;
+import com.kzaemrio.ithome.databinding.DialogCacheBinding;
 
 import java.util.Iterator;
 import java.util.List;
 
 public class MainView {
+
+    private final Context mContext;
 
     private final ItemListAdapter mAdapter;
 
@@ -24,12 +26,13 @@ public class MainView {
     private final ActivityMainBinding mBinding;
 
     public MainView(Context context) {
+        mContext = context;
 
-        mBinding = ActivityMainBinding.inflate(LayoutInflater.from(context));
+        mBinding = ActivityMainBinding.inflate(LayoutInflater.from(mContext));
 
         mAdapter = new ItemListAdapter();
 
-        mLayoutManager = new LinearLayoutManager(context);
+        mLayoutManager = new LinearLayoutManager(mContext);
         mLayoutManager.setStackFromEnd(true);
 
         mBinding.list.setLayoutManager(mLayoutManager);
@@ -70,29 +73,57 @@ public class MainView {
         return mBinding.list.getChildAdapterPosition(mBinding.list.getChildAt(0));
     }
 
-    public void showCacheDialog(Iterator<ItemListAdapter.ViewItem> iterator) {
-        AlertDialog dialog = new AlertDialog.Builder(mBinding.getRoot().getContext())
-                .setView(R.layout.dialog_cache)
+    public void showCacheDialog(List<ItemListAdapter.ViewItem> list) {
+        DialogCacheBinding binding = DialogCacheBinding.inflate(LayoutInflater.from(mContext));
+
+        AlertDialog dialog = new AlertDialog.Builder(mContext).setView(binding.getRoot())
+                .setNegativeButton(android.R.string.cancel, (dialogInterface, which) -> {
+
+                })
                 .create();
-        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+        int size = list.size();
+        int[] index = {0};
+
+        binding.bar.setMax(size);
+        Iterator<ItemListAdapter.ViewItem> iterator = list.iterator();
+        Runnable next = () -> {
+            index[0] = index[0] + 1;
+
+            Item item = iterator.next().getItem();
+
+            int progress = index[0];
+
+            binding.bar.setProgress(progress);
+            binding.text.setText(String.format(
+                    "%s/%s %s",
+                    progress, size,
+                    item.getTitle()
+            ));
+
+            Actions.showDetail(binding.web, item);
+        };
+
+        Actions.cacheEnabledWeb(binding.web).setWebViewClient(new WebViewClient() {
             @Override
-            public void onShow(DialogInterface dialogInterface) {
-                WebView web = Actions.cacheEnabledWeb(dialog.findViewById(R.id.web));
-                web.setWebViewClient(new WebViewClient() {
-                    @Override
-                    public void onPageFinished(WebView view, String url) {
-                        super.onPageFinished(view, url);
-                        if (iterator.hasNext()) {
-                            Actions.showDetail(web, iterator.next().getItem());
-                        } else {
-                            view.destroy();
-                            dialogInterface.cancel();
-                        }
-                    }
-                });
-                Actions.showDetail(web, iterator.next().getItem());
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                if (iterator.hasNext()) {
+                    next.run();
+                } else {
+                    dialog.cancel();
+                }
             }
         });
+
+        dialog.setOnShowListener(dialogInterface -> {
+            next.run();
+        });
+
+        dialog.setOnDismissListener(dialogInterface -> {
+            binding.web.destroy();
+        });
+
         dialog.show();
     }
 

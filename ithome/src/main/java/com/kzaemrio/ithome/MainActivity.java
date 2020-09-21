@@ -72,7 +72,7 @@ public class MainActivity extends ComponentActivity {
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.menu_cache) {
-            mView.showCacheDialog(mViewModel.getItemList().getValue().iterator());
+            mView.showCacheDialog(mViewModel.getItemList().getValue());
             return true;
         }
         return super.onOptionsItemSelected(item);
