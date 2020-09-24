@@ -67,7 +67,6 @@ public class MainViewModel extends AndroidViewModel {
                     if (position >= 0) {
                         mScrollPosition.postValue(MainView.ScrollPosition.create(position, itemPosition.getOffset()));
                     }
-                    itemPositionDao.delete(itemPosition);
                 }
             }
 
@@ -77,7 +76,7 @@ public class MainViewModel extends AndroidViewModel {
 
     public void saveItemPosition(int position, int offset) {
         Actions.executeOnBackground(() -> {
-            AppDataBaseHolder.getInstance(getApplication()).itemPositionDao().insert(
+            AppDataBaseHolder.getInstance(getApplication()).itemPositionDao().save(
                     new ItemPosition(
                             mItemList.getValue().get(position).getItem().getPubDate(),
                             offset
