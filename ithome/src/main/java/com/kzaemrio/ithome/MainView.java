@@ -7,6 +7,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.kzaemrio.ithome.databinding.ActivityMainBinding;
@@ -35,6 +36,7 @@ public class MainView {
         mLayoutManager = new LinearLayoutManager(mContext);
         mLayoutManager.setStackFromEnd(true);
 
+        mBinding.list.setHasFixedSize(true);
         mBinding.list.setLayoutManager(mLayoutManager);
         mBinding.list.setAdapter(mAdapter);
     }
@@ -49,6 +51,11 @@ public class MainView {
 
     public void bind(List<ItemListAdapter.ViewItem> list) {
         mAdapter.submitList(list);
+
+        ViewCompat.postOnAnimation(
+                mBinding.list,
+                () -> mBinding.list.smoothScrollBy(0, -128)
+        );
     }
 
     public void setCallback(Callback callback) {
