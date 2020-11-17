@@ -52,9 +52,10 @@ public class MainView {
     public void bind(List<ItemListAdapter.ViewItem> list) {
         mAdapter.submitList(list);
 
-        ViewCompat.postOnAnimation(
+        ViewCompat.postOnAnimationDelayed(
                 mBinding.list,
-                () -> mBinding.list.smoothScrollBy(0, -128)
+                () -> mBinding.list.smoothScrollBy(0, -16),
+                500L
         );
     }
 
