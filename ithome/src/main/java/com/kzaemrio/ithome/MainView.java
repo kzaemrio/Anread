@@ -40,7 +40,7 @@ public class MainView {
                 ViewCompat.postOnAnimationDelayed(
                         mBinding.list,
                         () -> mBinding.list.smoothScrollBy(0, -16),
-                        16L
+                        100L
                 );
             }
         });
