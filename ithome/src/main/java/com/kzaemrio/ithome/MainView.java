@@ -9,6 +9,7 @@ import android.webkit.WebViewClient;
 
 import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.kzaemrio.ithome.databinding.ActivityMainBinding;
 import com.kzaemrio.ithome.databinding.DialogCacheBinding;
@@ -32,6 +33,17 @@ public class MainView {
         mBinding = ActivityMainBinding.inflate(LayoutInflater.from(mContext));
 
         mAdapter = new ItemListAdapter();
+        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                ViewCompat.postOnAnimationDelayed(
+                        mBinding.list,
+                        () -> mBinding.list.smoothScrollBy(0, -16),
+                        16L
+                );
+            }
+        });
 
         mLayoutManager = new LinearLayoutManager(mContext);
         mLayoutManager.setStackFromEnd(true);
@@ -51,12 +63,6 @@ public class MainView {
 
     public void bind(List<ItemListAdapter.ViewItem> list) {
         mAdapter.submitList(list);
-
-        ViewCompat.postOnAnimationDelayed(
-                mBinding.list,
-                () -> mBinding.list.smoothScrollBy(0, -16),
-                500L
-        );
     }
 
     public void setCallback(Callback callback) {
