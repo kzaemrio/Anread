@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.core.util.Consumer;
+import androidx.recyclerview.widget.AsyncDifferConfig;
 import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,7 +33,7 @@ public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemL
     };
 
     public ItemListAdapter() {
-        super(new DiffUtil.ItemCallback<ViewItem>() {
+        super(new AsyncDifferConfig.Builder<>(new DiffUtil.ItemCallback<ViewItem>() {
             @Override
             public boolean areItemsTheSame(@NonNull ViewItem oldViewItem, @NonNull ViewItem newViewItem) {
                 return Objects.equals(oldViewItem.mItem.getLink(), newViewItem.mItem.getLink());
@@ -42,7 +43,7 @@ public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemL
             public boolean areContentsTheSame(@NonNull ViewItem oldViewItem, @NonNull ViewItem newViewItem) {
                 return true;
             }
-        });
+        }).setBackgroundThreadExecutor(Actions.pool).build());
     }
 
     public void setOnItemClickAction(Consumer<ItemListAdapter.ViewItem> onItemClickAction) {
