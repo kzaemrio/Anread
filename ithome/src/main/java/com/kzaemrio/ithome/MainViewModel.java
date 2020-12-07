@@ -1,7 +1,6 @@
 package com.kzaemrio.ithome;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -13,6 +12,7 @@ import com.kzaemrio.ithome.db.AppDataBaseHolder;
 import com.kzaemrio.ithome.db.ItemDao;
 import com.kzaemrio.ithome.db.ItemPositionDao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -53,7 +53,10 @@ public class MainViewModel extends AndroidViewModel {
 
             dao.cleanUp(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2));
 
-            List<ItemListAdapter.ViewItem> list = Actions.mapList(dao.getAll(), ItemListAdapter.ViewItem::create);
+            List<ItemListAdapter.ViewItem> list = new ArrayList<>(Actions.mapList(
+                    dao.getAll(),
+                    ItemListAdapter.ViewItem::create
+            ));
 
             boolean needScrollToLastPosition = mItemList.getValue() == null;
 
