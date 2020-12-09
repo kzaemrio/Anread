@@ -1,4 +1,4 @@
-package com.kzaemrio.ithome;
+package com.kzaemrio.ithome.model;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;

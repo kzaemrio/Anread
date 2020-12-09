@@ -6,7 +6,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import com.kzaemrio.ithome.Item;
+import com.kzaemrio.ithome.model.Item;
 
 import java.util.List;
 

@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.kzaemrio.ithome.db.AppDataBase;
+import com.kzaemrio.ithome.model.Item;
 
 import java.util.Objects;
 
@@ -33,8 +34,6 @@ public class DetailActivity extends ComponentActivity {
                 .putExtra(EXTRA_TITLE, title);
     }
 
-
-
     @Inject
     WebHelper mWebHelper;
 
@@ -49,7 +48,7 @@ public class DetailActivity extends ComponentActivity {
 
         Objects.requireNonNull(getActionBar()).setDisplayHomeAsUpEnabled(true);
 
-mAppDataBase                .itemDao()
+        mAppDataBase.itemDao()
                 .query(getIntent().getStringExtra(EXTRA_LINK))
                 .observe(this, this::bind);
     }

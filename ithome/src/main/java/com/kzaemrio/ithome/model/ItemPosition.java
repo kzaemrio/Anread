@@ -1,4 +1,4 @@
-package com.kzaemrio.ithome;
+package com.kzaemrio.ithome.model;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -9,10 +9,10 @@ import androidx.room.PrimaryKey;
 public class ItemPosition {
     @NonNull
     @PrimaryKey
-    private long mPubDate;
+    private final long mPubDate;
 
     @ColumnInfo
-    private int mOffset;
+    private final int mOffset;
 
     public ItemPosition(@NonNull long pubDate, int offset) {
         mPubDate = pubDate;

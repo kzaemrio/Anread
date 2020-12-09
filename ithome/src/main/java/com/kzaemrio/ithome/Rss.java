@@ -2,6 +2,8 @@ package com.kzaemrio.ithome;
 
 import android.text.TextUtils;
 
+import com.kzaemrio.ithome.model.Item;
+
 import org.threeten.bp.ZoneId;
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
@@ -70,7 +72,7 @@ public class Rss {
         private boolean pubDate;
 
         private String mChannelName;
-        private LinkedList<Item> mList = new LinkedList<>();
+        private final LinkedList<Item> mList = new LinkedList<>();
         private Item.Builder mBuilder;
 
         public ParseHandler(String channelUrl) {

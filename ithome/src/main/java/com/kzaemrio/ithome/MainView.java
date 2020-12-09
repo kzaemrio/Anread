@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.kzaemrio.ithome.databinding.ActivityMainBinding;
 import com.kzaemrio.ithome.databinding.DialogCacheBinding;
+import com.kzaemrio.ithome.model.Item;
 
 import java.util.Iterator;
 import java.util.List;
@@ -25,12 +26,12 @@ public class MainView {
 
     private final Context mContext;
 
+    private LinearLayoutManager mLayoutManager;
+
+    private ActivityMainBinding mBinding;
+
     @Inject
     ItemListAdapter mAdapter;
-
-    LinearLayoutManager mLayoutManager;
-
-    ActivityMainBinding mBinding;
 
     @Inject
     WebHelper mWebHelper;

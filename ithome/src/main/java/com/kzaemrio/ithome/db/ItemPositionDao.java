@@ -5,7 +5,7 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
-import com.kzaemrio.ithome.ItemPosition;
+import com.kzaemrio.ithome.model.ItemPosition;
 
 @Dao
 public interface ItemPositionDao {
