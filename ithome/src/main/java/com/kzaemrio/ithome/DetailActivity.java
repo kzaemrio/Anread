@@ -17,6 +17,11 @@ import com.kzaemrio.ithome.db.AppDataBaseHolder;
 
 import java.util.Objects;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class DetailActivity extends ComponentActivity {
 
     private static final String EXTRA_LINK = "EXTRA_LINK";
@@ -27,6 +32,11 @@ public class DetailActivity extends ComponentActivity {
                 .putExtra(EXTRA_LINK, link)
                 .putExtra(EXTRA_TITLE, title);
     }
+
+
+
+    @Inject
+    WebHelper mWebHelper;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,7 +55,7 @@ public class DetailActivity extends ComponentActivity {
     private void bind(Item item) {
         SwipeRefreshLayout refreshLayout = new SwipeRefreshLayout(this);
 
-        WebView webView = Actions.cacheEnabledWeb(new WebView(getApplicationContext()));
+        WebView webView = mWebHelper.cacheEnabledWeb(new WebView(getApplicationContext()));
 
         webView.setWebViewClient(new WebViewClient() {
             @Override
@@ -64,7 +74,7 @@ public class DetailActivity extends ComponentActivity {
 
         refreshLayout.addView(webView);
 
-        Actions.showDetail(webView, item);
+        mWebHelper.showDetail(webView, item);
 
         setContentView(refreshLayout);
     }

@@ -19,6 +19,9 @@ public class MainActivity extends ComponentActivity {
     @Inject
     MainView mView;
 
+    @Inject
+    WebHelper mWebHelper;
+
     private MainViewModel mViewModel;
 
     @Override
@@ -44,7 +47,7 @@ public class MainActivity extends ComponentActivity {
 
             @Override
             public void onItemLongClick(ItemListAdapter.ViewItem item) {
-                Actions.shareItem(MainActivity.this, item.getItem());
+                mWebHelper.shareItem(MainActivity.this, item.getItem());
             }
         });
         setContentView(mView.getContentView());

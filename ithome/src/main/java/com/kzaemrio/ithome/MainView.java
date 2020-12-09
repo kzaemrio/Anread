@@ -32,6 +32,9 @@ public class MainView {
     private final ActivityMainBinding mBinding;
 
     @Inject
+    WebHelper mWebHelper;
+
+    @Inject
     public MainView(@ActivityContext Context context) {
         mContext = context;
 
@@ -120,10 +123,10 @@ public class MainView {
                     item.getTitle()
             ));
 
-            Actions.showDetail(binding.web, item);
+            mWebHelper.showDetail(binding.web, item);
         };
 
-        Actions.cacheEnabledWeb(binding.web).setWebViewClient(new WebViewClient() {
+        mWebHelper.cacheEnabledWeb(binding.web).setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
