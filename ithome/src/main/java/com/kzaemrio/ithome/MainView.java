@@ -25,11 +25,12 @@ public class MainView {
 
     private final Context mContext;
 
-    private final ItemListAdapter mAdapter;
+    @Inject
+    ItemListAdapter mAdapter;
 
-    private final LinearLayoutManager mLayoutManager;
+    LinearLayoutManager mLayoutManager;
 
-    private final ActivityMainBinding mBinding;
+    ActivityMainBinding mBinding;
 
     @Inject
     WebHelper mWebHelper;
@@ -37,10 +38,11 @@ public class MainView {
     @Inject
     public MainView(@ActivityContext Context context) {
         mContext = context;
+    }
 
+    public void init() {
         mBinding = ActivityMainBinding.inflate(LayoutInflater.from(mContext));
 
-        mAdapter = new ItemListAdapter();
         mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeInserted(int positionStart, int itemCount) {

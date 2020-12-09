@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
-import com.kzaemrio.ithome.db.AppDataBaseHolder;
+import com.kzaemrio.ithome.db.AppDataBase;
 
 import java.util.Objects;
 
@@ -38,6 +38,9 @@ public class DetailActivity extends ComponentActivity {
     @Inject
     WebHelper mWebHelper;
 
+    @Inject
+    AppDataBase mAppDataBase;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,8 +49,7 @@ public class DetailActivity extends ComponentActivity {
 
         Objects.requireNonNull(getActionBar()).setDisplayHomeAsUpEnabled(true);
 
-        AppDataBaseHolder.getInstance(getApplication())
-                .itemDao()
+mAppDataBase                .itemDao()
                 .query(getIntent().getStringExtra(EXTRA_LINK))
                 .observe(this, this::bind);
     }

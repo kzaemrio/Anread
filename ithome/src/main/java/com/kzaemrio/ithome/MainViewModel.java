@@ -9,7 +9,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.kzaemrio.ithome.db.AppDataBase;
-import com.kzaemrio.ithome.db.AppDataBaseHolder;
 import com.kzaemrio.ithome.db.ItemDao;
 import com.kzaemrio.ithome.db.ItemPositionDao;
 
@@ -29,6 +28,7 @@ public class MainViewModel extends AndroidViewModel {
     private final BackgroundExecutor mExecutor;
     private final ListHelper mListHelper;
     private final Rss mRss;
+    private final AppDataBase mAppDataBase;
 
     @ViewModelInject
     public MainViewModel(@NonNull Application application) {
@@ -41,6 +41,7 @@ public class MainViewModel extends AndroidViewModel {
         mExecutor = entryPoint.backgroundExecutor();
         mListHelper = entryPoint.listHelper();
         mRss = entryPoint.rss();
+        mAppDataBase = entryPoint.appDataBase();
     }
 
     public LiveData<Boolean> getIsShowLoading() {
@@ -59,7 +60,7 @@ public class MainViewModel extends AndroidViewModel {
         mExecutor.executeOnBackground(() -> {
             mIsShowLoading.postValue(true);
 
-            AppDataBase db = AppDataBaseHolder.getInstance(getApplication());
+            AppDataBase db = mAppDataBase;
 
             ItemDao dao = db.itemDao();
 
@@ -93,7 +94,7 @@ public class MainViewModel extends AndroidViewModel {
 
     public void saveItemPosition(int position, int offset) {
         mExecutor.executeOnBackground(() -> {
-            AppDataBaseHolder.getInstance(getApplication()).itemPositionDao().save(
+            mAppDataBase.itemPositionDao().save(
                     new ItemPosition(
                             mItemList.getValue().get(position).getItem().getPubDate(),
                             offset

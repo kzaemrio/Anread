@@ -23,6 +23,9 @@ import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+
+import javax.inject.Inject;
 
 public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemListAdapter.Holder> {
 
@@ -32,7 +35,8 @@ public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemL
     private Consumer<ItemListAdapter.ViewItem> mOnItemLongClickAction = s -> {
     };
 
-    public ItemListAdapter() {
+    @Inject
+    public ItemListAdapter(ExecutorService pool) {
         super(new AsyncDifferConfig.Builder<>(new DiffUtil.ItemCallback<ViewItem>() {
             @Override
             public boolean areItemsTheSame(@NonNull ViewItem oldViewItem, @NonNull ViewItem newViewItem) {
@@ -43,7 +47,7 @@ public class ItemListAdapter extends ListAdapter<ItemListAdapter.ViewItem, ItemL
             public boolean areContentsTheSame(@NonNull ViewItem oldViewItem, @NonNull ViewItem newViewItem) {
                 return true;
             }
-        }).setBackgroundThreadExecutor(Actions.pool).build());
+        }).setBackgroundThreadExecutor(pool).build());
     }
 
     public void setOnItemClickAction(Consumer<ItemListAdapter.ViewItem> onItemClickAction) {

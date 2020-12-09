@@ -22,7 +22,7 @@ public class MainActivity extends ComponentActivity {
     @Inject
     WebHelper mWebHelper;
 
-     MainViewModel mViewModel;
+    MainViewModel mViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -30,6 +30,7 @@ public class MainActivity extends ComponentActivity {
 
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
+        mView.init();
         mView.setCallback(new MainView.Callback() {
             @Override
             public void onRefresh() {
