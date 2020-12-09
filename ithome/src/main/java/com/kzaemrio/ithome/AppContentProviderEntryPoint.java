@@ -8,4 +8,6 @@ import dagger.hilt.android.components.ApplicationComponent;
 @InstallIn(ApplicationComponent.class)
 public interface AppContentProviderEntryPoint {
     BackgroundExecutor backgroundExecutor();
+
+    ListHelper listHelper();
 }

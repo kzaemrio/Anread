@@ -60,25 +60,6 @@ public interface Actions {
         return Objects.requireNonNull(response.body()).byteStream();
     }
 
-
-    static <T, V extends Comparable<? super V>> int binarySearch(List<T> list, V key, Function<T, V> mapper) {
-        return Collections.binarySearch(mapList(list, mapper), key, (o1, o2) -> o2.compareTo(o1));
-    }
-
-    static <T, V> List<V> mapList(List<T> list, Function<T, V> mapper) {
-        return new AbstractList<V>() {
-            @Override
-            public V get(int index) {
-                return mapper.apply(list.get(index));
-            }
-
-            @Override
-            public int size() {
-                return list.size();
-            }
-        };
-    }
-
     class ParseHandler extends DefaultHandler {
 
         private final String mChannelUrl;
@@ -182,42 +163,45 @@ public interface Actions {
         public List<Item> getItemArray() {
             return mList;
         }
-    }
 
-    class Box {
-        private final List<String> mList = new LinkedList<>();
-        private int mSize;
+        static long getPubDate(String trim) {
+            ZonedDateTime originalZonedDateTime = getZonedDateTime(trim);
+            ZonedDateTime fixedZonedDateTime = originalZonedDateTime.withZoneSameInstant(ZoneId.systemDefault());
+            return fixedZonedDateTime.toInstant().toEpochMilli();
+        }
 
-        public void append(String text) {
-            if (!TextUtils.isEmpty(text)) {
-                mList.add(text);
-                mSize += text.length();
+
+        static ZonedDateTime getZonedDateTime(String time) {
+            try {
+                return ZonedDateTime.parse(time, DateTimeFormatter.ISO_DATE);
+            } catch (Exception e) {
+                return ZonedDateTime.parse(time, DateTimeFormatter.RFC_1123_DATE_TIME);
             }
         }
 
-        public String flush() {
-            StringBuilder builder = new StringBuilder(mSize);
-            for (String s : mList) {
-                builder.append(s);
+
+
+        static class Box {
+            private final List<String> mList = new LinkedList<>();
+            private int mSize;
+
+            public void append(String text) {
+                if (!TextUtils.isEmpty(text)) {
+                    mList.add(text);
+                    mSize += text.length();
+                }
             }
 
-            mList.clear();
-            mSize = 0;
-            return builder.toString();
-        }
-    }
+            public String flush() {
+                StringBuilder builder = new StringBuilder(mSize);
+                for (String s : mList) {
+                    builder.append(s);
+                }
 
-    static long getPubDate(String trim) {
-        ZonedDateTime originalZonedDateTime = getZonedDateTime(trim);
-        ZonedDateTime fixedZonedDateTime = originalZonedDateTime.withZoneSameInstant(ZoneId.systemDefault());
-        return fixedZonedDateTime.toInstant().toEpochMilli();
-    }
-
-    static ZonedDateTime getZonedDateTime(String time) {
-        try {
-            return ZonedDateTime.parse(time, DateTimeFormatter.ISO_DATE);
-        } catch (Exception e) {
-            return ZonedDateTime.parse(time, DateTimeFormatter.RFC_1123_DATE_TIME);
+                mList.clear();
+                mSize = 0;
+                return builder.toString();
+            }
         }
     }
 }

@@ -17,8 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import javax.inject.Inject;
-
 import dagger.hilt.android.EntryPointAccessors;
 
 
@@ -28,7 +26,8 @@ public class MainViewModel extends AndroidViewModel {
     private final MutableLiveData<List<ItemListAdapter.ViewItem>> mItemList;
     private final MutableLiveData<MainView.ScrollPosition> mScrollPosition;
 
-    BackgroundExecutor mExecutor;
+    private final BackgroundExecutor mExecutor;
+    private final ListHelper mListHelper;
 
     @ViewModelInject
     public MainViewModel(@NonNull Application application) {
@@ -37,7 +36,9 @@ public class MainViewModel extends AndroidViewModel {
         mItemList = new MutableLiveData<>();
         mScrollPosition = new MutableLiveData<>();
 
-        mExecutor = EntryPointAccessors.fromApplication(application, AppContentProviderEntryPoint.class).backgroundExecutor();
+        AppContentProviderEntryPoint entryPoint = EntryPointAccessors.fromApplication(application, AppContentProviderEntryPoint.class);
+        mExecutor = entryPoint.backgroundExecutor();
+        mListHelper = entryPoint.listHelper();
     }
 
     public LiveData<Boolean> getIsShowLoading() {
@@ -64,7 +65,7 @@ public class MainViewModel extends AndroidViewModel {
 
             dao.cleanUp(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2));
 
-            List<ItemListAdapter.ViewItem> list = new ArrayList<>(Actions.mapList(
+            List<ItemListAdapter.ViewItem> list = new ArrayList<>(mListHelper.mapList(
                     dao.getAll(),
                     ItemListAdapter.ViewItem::create
             ));
@@ -77,7 +78,7 @@ public class MainViewModel extends AndroidViewModel {
                 ItemPositionDao itemPositionDao = db.itemPositionDao();
                 ItemPosition itemPosition = itemPositionDao.first();
                 if (itemPosition != null) {
-                    int position = Actions.binarySearch(list, itemPosition.getPubDate(), viewItem -> viewItem.getItem().getPubDate());
+                    int position = mListHelper.binarySearch(list, itemPosition.getPubDate(), viewItem -> viewItem.getItem().getPubDate());
                     if (position >= 0) {
                         mScrollPosition.postValue(MainView.ScrollPosition.create(position, itemPosition.getOffset()));
                     }
