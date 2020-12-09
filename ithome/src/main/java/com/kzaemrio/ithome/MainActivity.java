@@ -9,16 +9,22 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
+
+@AndroidEntryPoint
 public class MainActivity extends ComponentActivity {
 
-    private MainView mView;
+    @Inject
+    MainView mView;
+
     private MainViewModel mViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mView = new MainView(this);
         mViewModel = new ViewModelProvider(this).get(MainViewModel.class);
 
         mView.setCallback(new MainView.Callback() {

@@ -17,6 +17,10 @@ import com.kzaemrio.ithome.databinding.DialogCacheBinding;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.qualifiers.ActivityContext;
+
 public class MainView {
 
     private final Context mContext;
@@ -27,7 +31,8 @@ public class MainView {
 
     private final ActivityMainBinding mBinding;
 
-    public MainView(Context context) {
+    @Inject
+    public MainView(@ActivityContext Context context) {
         mContext = context;
 
         mBinding = ActivityMainBinding.inflate(LayoutInflater.from(mContext));
