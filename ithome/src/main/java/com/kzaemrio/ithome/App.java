@@ -12,6 +12,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Actions.executeOnBackground(() -> AndroidThreeTen.init(this));
+        AndroidThreeTen.init(this);
     }
 }

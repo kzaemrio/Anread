@@ -13,6 +13,6 @@ import dagger.hilt.android.components.ApplicationComponent;
 public class AppModule {
     @Provides
     public static ExecutorService executorService() {
-        return Executors.newFixedThreadPool(1);
+        return Executors.newSingleThreadExecutor();
     }
 }

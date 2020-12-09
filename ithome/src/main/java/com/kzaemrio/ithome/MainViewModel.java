@@ -3,6 +3,7 @@ package com.kzaemrio.ithome;
 import android.app.Application;
 
 import androidx.annotation.NonNull;
+import androidx.hilt.lifecycle.ViewModelInject;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -16,17 +17,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
+import dagger.hilt.android.EntryPointAccessors;
+
+
 public class MainViewModel extends AndroidViewModel {
 
     private final MutableLiveData<Boolean> mIsShowLoading;
     private final MutableLiveData<List<ItemListAdapter.ViewItem>> mItemList;
     private final MutableLiveData<MainView.ScrollPosition> mScrollPosition;
 
+    BackgroundExecutor mExecutor;
+
+    @ViewModelInject
     public MainViewModel(@NonNull Application application) {
         super(application);
         mIsShowLoading = new MutableLiveData<>();
         mItemList = new MutableLiveData<>();
         mScrollPosition = new MutableLiveData<>();
+
+        mExecutor = EntryPointAccessors.fromApplication(application, AppContentProviderEntryPoint.class).backgroundExecutor();
     }
 
     public LiveData<Boolean> getIsShowLoading() {
@@ -42,7 +53,7 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void load() {
-        Actions.executeOnBackground(() -> {
+        mExecutor.executeOnBackground(() -> {
             mIsShowLoading.postValue(true);
 
             AppDataBase db = AppDataBaseHolder.getInstance(getApplication());
@@ -78,7 +89,7 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void saveItemPosition(int position, int offset) {
-        Actions.executeOnBackground(() -> {
+        mExecutor.executeOnBackground(() -> {
             AppDataBaseHolder.getInstance(getApplication()).itemPositionDao().save(
                     new ItemPosition(
                             mItemList.getValue().get(position).getItem().getPubDate(),

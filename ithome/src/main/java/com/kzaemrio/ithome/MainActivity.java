@@ -22,7 +22,7 @@ public class MainActivity extends ComponentActivity {
     @Inject
     WebHelper mWebHelper;
 
-    private MainViewModel mViewModel;
+     MainViewModel mViewModel;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

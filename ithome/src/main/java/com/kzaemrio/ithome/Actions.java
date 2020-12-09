@@ -1,16 +1,9 @@
 package com.kzaemrio.ithome;
 
-import android.content.Context;
-import android.content.Intent;
 import android.text.TextUtils;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-
-import androidx.core.content.ContextCompat;
 
 import com.kzaemrio.ithome.function.Function;
 
-import org.threeten.bp.Instant;
 import org.threeten.bp.ZoneId;
 import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
@@ -44,10 +37,6 @@ public interface Actions {
     OkHttpClient client = new OkHttpClient.Builder().dispatcher(new Dispatcher(pool)).build();
 
     String url = "https://www.ithome.com/rss/";
-
-    static void executeOnBackground(Runnable runnable) {
-        pool.execute(runnable);
-    }
 
     static List<Item> requestItemList() {
         try {
