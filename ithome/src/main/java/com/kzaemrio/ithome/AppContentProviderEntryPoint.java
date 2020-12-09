@@ -10,4 +10,6 @@ public interface AppContentProviderEntryPoint {
     BackgroundExecutor backgroundExecutor();
 
     ListHelper listHelper();
+
+    Rss rss();
 }

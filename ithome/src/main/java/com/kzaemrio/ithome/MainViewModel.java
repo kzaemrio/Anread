@@ -28,6 +28,7 @@ public class MainViewModel extends AndroidViewModel {
 
     private final BackgroundExecutor mExecutor;
     private final ListHelper mListHelper;
+    private final Rss mRss;
 
     @ViewModelInject
     public MainViewModel(@NonNull Application application) {
@@ -39,6 +40,7 @@ public class MainViewModel extends AndroidViewModel {
         AppContentProviderEntryPoint entryPoint = EntryPointAccessors.fromApplication(application, AppContentProviderEntryPoint.class);
         mExecutor = entryPoint.backgroundExecutor();
         mListHelper = entryPoint.listHelper();
+        mRss = entryPoint.rss();
     }
 
     public LiveData<Boolean> getIsShowLoading() {
@@ -61,7 +63,7 @@ public class MainViewModel extends AndroidViewModel {
 
             ItemDao dao = db.itemDao();
 
-            dao.insert(Actions.requestItemList());
+            dao.insert(mRss.requestItemList());
 
             dao.cleanUp(System.currentTimeMillis() - TimeUnit.DAYS.toMillis(2));
 
